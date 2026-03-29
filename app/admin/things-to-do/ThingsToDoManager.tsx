@@ -213,9 +213,9 @@ export default function ThingsToDoManager({
         <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Category</label>
           <select name="category_id" defaultValue={act?.category_id || ""} className={INPUT_CLS}>
-            <option value="" className="bg-[#0D1B3E]">— Select —</option>
+            <option value="" className="bg-[#0D1B3E] text-white">— Select —</option>
             {categories.map((cat) => (
-              <option key={cat.id} value={cat.id} className="bg-[#0D1B3E]">{cat.name}</option>
+              <option key={cat.id} value={cat.id} className="bg-[#0D1B3E] text-white">{cat.name}</option>
             ))}
           </select>
         </div>
@@ -255,9 +255,9 @@ export default function ThingsToDoManager({
         <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Price Range</label>
           <select name="price_range" defaultValue={act?.price_range || ""} className={INPUT_CLS}>
-            <option value="" className="bg-[#0D1B3E]">— Select —</option>
+            <option value="" className="bg-[#0D1B3E] text-white">— Select —</option>
             {PRICE_OPTIONS.map((p) => (
-              <option key={p} value={p} className="bg-[#0D1B3E]">{p}</option>
+              <option key={p} value={p} className="bg-[#0D1B3E] text-white">{p}</option>
             ))}
           </select>
         </div>
@@ -386,9 +386,9 @@ export default function ThingsToDoManager({
               onChange={(e) => setCatFilter(e.target.value)}
               className="px-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-accent"
             >
-              <option value="all" className="bg-[#0D1B3E]">All Categories</option>
+              <option value="all" className="bg-[#0D1B3E] text-white">All Categories</option>
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.id} className="bg-[#0D1B3E]">{cat.name}</option>
+                <option key={cat.id} value={cat.id} className="bg-[#0D1B3E] text-white">{cat.name}</option>
               ))}
             </select>
           </div>

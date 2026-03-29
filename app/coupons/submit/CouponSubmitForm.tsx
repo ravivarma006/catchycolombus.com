@@ -56,9 +56,9 @@ export default function CouponSubmitForm({ categories }: { categories: Category[
             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all [color-scheme:dark]"
             defaultValue=""
           >
-            <option value="" disabled>Select a category...</option>
+            <option value="" disabled className="bg-[#0D1B3E] text-white">Select a category...</option>
             {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
+              <option key={cat.id} value={cat.id} className="bg-[#0D1B3E] text-white">
                 {cat.name}
               </option>
             ))}
