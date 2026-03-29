@@ -1,0 +1,442 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import {
+  createHeroSlide,
+  updateHeroSlide,
+  toggleHeroSlideActive,
+  deleteHeroSlide,
+  reorderHeroSlides,
+  createHeroStat,
+  updateHeroStat,
+  toggleHeroStatActive,
+  deleteHeroStat,
+} from "@/app/admin/hero/actions";
+import ImageUpload from "@/components/admin/ImageUpload";
+import Image from "next/image";
+
+interface HeroSlide {
+  id: string;
+  image_url: string;
+  thumb_url: string;
+  location: string;
+  tag: string;
+  headline: string[];
+  subtitle: string;
+  overlay_from: string;
+  overlay_to: string;
+  is_active: boolean;
+  display_order: number;
+}
+
+interface HeroStat {
+  id: string;
+  value: string;
+  label: string;
+  display_order: number;
+  is_active: boolean;
+}
+
+const INPUT_CLS =
+  "w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white text-sm placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-accent";
+
+export default function HeroManager({
+  slides,
+  stats,
+}: {
+  slides: HeroSlide[];
+  stats: HeroStat[];
+}) {
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState<"slides" | "stats">("slides");
+
+  // Slide form state
+  const [showSlideForm, setShowSlideForm] = useState(false);
+  const [editingSlide, setEditingSlide] = useState<HeroSlide | null>(null);
+  const [imageUrl, setImageUrl] = useState("");
+  const [thumbUrl, setThumbUrl] = useState("");
+  const [editImageUrl, setEditImageUrl] = useState("");
+  const [editThumbUrl, setEditThumbUrl] = useState("");
+  const [headlineLines, setHeadlineLines] = useState<string[]>([""]);
+  const [editHeadlineLines, setEditHeadlineLines] = useState<string[]>([""]);
+
+  // Stat form state
+  const [showStatForm, setShowStatForm] = useState(false);
+  const [editingStat, setEditingStat] = useState<HeroStat | null>(null);
+
+  /* ── Slide Handlers ── */
+  function handleCreateSlide(formData: FormData) {
+    setError(null);
+    formData.set("headline", JSON.stringify(headlineLines.filter((l) => l.trim())));
+    startTransition(async () => {
+      const result = await createHeroSlide(formData);
+      if (result.error) setError(result.error);
+      else {
+        setShowSlideForm(false);
+        setImageUrl("");
+        setThumbUrl("");
+        setHeadlineLines([""]);
+      }
+    });
+  }
+
+  function handleUpdateSlide(formData: FormData) {
+    if (!editingSlide) return;
+    setError(null);
+    formData.set("headline", JSON.stringify(editHeadlineLines.filter((l) => l.trim())));
+    startTransition(async () => {
+      const result = await updateHeroSlide(editingSlide.id, formData);
+      if (result.error) setError(result.error);
+      else {
+        setEditingSlide(null);
+        setEditImageUrl("");
+        setEditThumbUrl("");
+        setEditHeadlineLines([""]);
+      }
+    });
+  }
+
+  function openEditSlide(slide: HeroSlide) {
+    setEditingSlide(slide);
+    setEditImageUrl(slide.image_url);
+    setEditThumbUrl(slide.thumb_url);
+    setEditHeadlineLines([...slide.headline]);
+    setShowSlideForm(false);
+    setError(null);
+  }
+
+  function handleToggleSlide(id: string, current: boolean) {
+    startTransition(async () => { await toggleHeroSlideActive(id, current); });
+  }
+
+  function handleDeleteSlide(id: string) {
+    if (!confirm("Delete this slide?")) return;
+    startTransition(async () => { await deleteHeroSlide(id); });
+  }
+
+  function handleMoveSlide(index: number, direction: "up" | "down") {
+    const ids = slides.map((s) => s.id);
+    const swapIdx = direction === "up" ? index - 1 : index + 1;
+    if (swapIdx < 0 || swapIdx >= ids.length) return;
+    [ids[index], ids[swapIdx]] = [ids[swapIdx], ids[index]];
+    startTransition(async () => { await reorderHeroSlides(ids); });
+  }
+
+  /* ── Stat Handlers ── */
+  function handleCreateStat(formData: FormData) {
+    setError(null);
+    startTransition(async () => {
+      const result = await createHeroStat(formData);
+      if (result.error) setError(result.error);
+      else setShowStatForm(false);
+    });
+  }
+
+  function handleUpdateStat(formData: FormData) {
+    if (!editingStat) return;
+    setError(null);
+    startTransition(async () => {
+      const result = await updateHeroStat(editingStat.id, formData);
+      if (result.error) setError(result.error);
+      else setEditingStat(null);
+    });
+  }
+
+  function handleToggleStat(id: string, current: boolean) {
+    startTransition(async () => { await toggleHeroStatActive(id, current); });
+  }
+
+  function handleDeleteStat(id: string) {
+    if (!confirm("Delete this stat?")) return;
+    startTransition(async () => { await deleteHeroStat(id); });
+  }
+
+  /* ── Headline line helpers ── */
+  function updateLine(lines: string[], setLines: (l: string[]) => void, idx: number, val: string) {
+    const next = [...lines];
+    next[idx] = val;
+    setLines(next);
+  }
+  function addLine(lines: string[], setLines: (l: string[]) => void) {
+    setLines([...lines, ""]);
+  }
+  function removeLine(lines: string[], setLines: (l: string[]) => void, idx: number) {
+    if (lines.length <= 1) return;
+    setLines(lines.filter((_, i) => i !== idx));
+  }
+
+  /* ── Slide Form ── */
+  function renderSlideForm(mode: "create" | "edit", slide?: HeroSlide) {
+    const isEdit = mode === "edit" && slide;
+    const imgUrl = isEdit ? editImageUrl : imageUrl;
+    const setImgUrl = isEdit ? setEditImageUrl : setImageUrl;
+    const thmUrl = isEdit ? editThumbUrl : thumbUrl;
+    const setThmUrl = isEdit ? setEditThumbUrl : setThumbUrl;
+    const lines = isEdit ? editHeadlineLines : headlineLines;
+    const setLines = isEdit ? setEditHeadlineLines : setHeadlineLines;
+
+    return (
+      <form
+        action={isEdit ? handleUpdateSlide : handleCreateSlide}
+        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-8 space-y-4"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Main Image *</label>
+            <ImageUpload bucket="city-images" folder="hero" onUpload={setImgUrl} currentUrl={imgUrl} />
+            <input type="hidden" name="image_url" value={imgUrl} />
+          </div>
+          <div>
+            <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Thumbnail *</label>
+            <ImageUpload bucket="city-images" folder="hero/thumbs" onUpload={setThmUrl} currentUrl={thmUrl} />
+            <input type="hidden" name="thumb_url" value={thmUrl} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Location *</label>
+            <input name="location" required defaultValue={slide?.location || ""} className={INPUT_CLS} placeholder="e.g. Downtown Columbus" />
+          </div>
+          <div>
+            <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Tag *</label>
+            <input name="tag" required defaultValue={slide?.tag || ""} className={INPUT_CLS} placeholder="e.g. City Skyline" />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Headline Lines *</label>
+          <p className="text-white/30 text-xs mb-2">Each line appears as a separate animated line. The last line is highlighted in accent color.</p>
+          {lines.map((line, i) => (
+            <div key={i} className="flex gap-2 mb-2">
+              <input
+                value={line}
+                onChange={(e) => updateLine(lines, setLines, i, e.target.value)}
+                className={INPUT_CLS}
+                placeholder={`Line ${i + 1}`}
+              />
+              {lines.length > 1 && (
+                <button type="button" onClick={() => removeLine(lines, setLines, i)} className="px-3 py-1 text-xs font-bold rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition shrink-0">
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+          <button type="button" onClick={() => addLine(lines, setLines)} className="text-xs font-bold text-accent hover:text-yellow-400 transition">
+            + Add Line
+          </button>
+          <input type="hidden" name="headline" value={JSON.stringify(lines.filter((l) => l.trim()))} />
+        </div>
+
+        <div>
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Subtitle *</label>
+          <textarea name="subtitle" required rows={2} defaultValue={slide?.subtitle || ""} className={`${INPUT_CLS} resize-none`} placeholder="Subtitle text..." />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Overlay From</label>
+            <div className="flex items-center gap-2">
+              <input name="overlay_from" defaultValue={slide?.overlay_from || "rgba(0,20,50,0.48)"} className={INPUT_CLS} placeholder="rgba(0,20,50,0.48)" />
+              <div className="w-8 h-8 rounded-lg border border-white/20 shrink-0" style={{ backgroundColor: isEdit ? (slide?.overlay_from || "rgba(0,20,50,0.48)") : "rgba(0,20,50,0.48)" }} />
+            </div>
+          </div>
+          <div>
+            <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Overlay To</label>
+            <div className="flex items-center gap-2">
+              <input name="overlay_to" defaultValue={slide?.overlay_to || "rgba(0,20,50,0.50)"} className={INPUT_CLS} placeholder="rgba(0,20,50,0.50)" />
+              <div className="w-8 h-8 rounded-lg border border-white/20 shrink-0" style={{ backgroundColor: isEdit ? (slide?.overlay_to || "rgba(0,20,50,0.50)") : "rgba(0,20,50,0.50)" }} />
+            </div>
+          </div>
+        </div>
+
+        {error && <p className="text-red-400 text-sm">{error}</p>}
+        <div className="flex gap-3">
+          <button type="submit" disabled={isPending} className="px-6 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition disabled:opacity-50">
+            {isPending ? (isEdit ? "Saving..." : "Creating...") : (isEdit ? "Save Changes" : "Create Slide")}
+          </button>
+          <button type="button" onClick={() => isEdit ? setEditingSlide(null) : setShowSlideForm(false)} className="px-6 py-2.5 bg-white/10 text-white/60 font-bold rounded-xl text-sm hover:bg-white/20 transition">
+            Cancel
+          </button>
+        </div>
+      </form>
+    );
+  }
+
+  /* ── Stat Form ── */
+  function renderStatForm(mode: "create" | "edit", stat?: HeroStat) {
+    const isEdit = mode === "edit" && stat;
+
+    return (
+      <form
+        action={isEdit ? handleUpdateStat : handleCreateStat}
+        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-6 space-y-4"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Value *</label>
+            <input name="value" required defaultValue={stat?.value || ""} className={INPUT_CLS} placeholder="e.g. 900K+" />
+          </div>
+          <div>
+            <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Label *</label>
+            <input name="label" required defaultValue={stat?.label || ""} className={INPUT_CLS} placeholder="e.g. Residents" />
+          </div>
+        </div>
+        {error && <p className="text-red-400 text-sm">{error}</p>}
+        <div className="flex gap-3">
+          <button type="submit" disabled={isPending} className="px-6 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition disabled:opacity-50">
+            {isPending ? (isEdit ? "Saving..." : "Creating...") : (isEdit ? "Save Changes" : "Create Stat")}
+          </button>
+          <button type="button" onClick={() => isEdit ? setEditingStat(null) : setShowStatForm(false)} className="px-6 py-2.5 bg-white/10 text-white/60 font-bold rounded-xl text-sm hover:bg-white/20 transition">
+            Cancel
+          </button>
+        </div>
+      </form>
+    );
+  }
+
+  return (
+    <div>
+      {/* Tab Switcher */}
+      <div className="flex gap-2 mb-6">
+        {(["slides", "stats"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => { setTab(t); setError(null); }}
+            className={`px-4 py-2 text-sm font-bold rounded-xl transition ${
+              tab === t ? "bg-accent text-primary" : "bg-white/10 text-white/60 hover:bg-white/20"
+            }`}
+          >
+            {t === "slides" ? `Slides (${slides.length})` : `Stats (${stats.length})`}
+          </button>
+        ))}
+      </div>
+
+      {/* ═══════════ SLIDES TAB ═══════════ */}
+      {tab === "slides" && (
+        <div>
+          {!editingSlide && (
+            <button
+              onClick={() => { setShowSlideForm(!showSlideForm); setError(null); setHeadlineLines([""]); }}
+              className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
+            >
+              {showSlideForm ? "Cancel" : "+ New Slide"}
+            </button>
+          )}
+
+          {showSlideForm && !editingSlide && renderSlideForm("create")}
+          {editingSlide && renderSlideForm("edit", editingSlide)}
+
+          {slides.length === 0 ? (
+            <p className="text-white/30 text-sm">No hero slides yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {slides.map((slide, idx) => (
+                <div
+                  key={slide.id}
+                  className={`bg-white/[0.05] border rounded-2xl p-5 transition ${
+                    slide.is_active ? "border-white/10" : "border-white/5 opacity-50"
+                  } ${editingSlide?.id === slide.id ? "ring-2 ring-accent" : ""}`}
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Thumbnail preview */}
+                    <div className="relative w-20 h-14 rounded-xl overflow-hidden shrink-0">
+                      <Image src={slide.thumb_url} alt={slide.location} fill className="object-cover" sizes="80px" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/30">
+                          #{idx + 1}
+                        </span>
+                        {!slide.is_active && (
+                          <span className="text-[10px] font-bold uppercase tracking-widest bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">Inactive</span>
+                        )}
+                        <span className="text-[10px] font-bold uppercase tracking-widest bg-white/10 text-white/40 px-2 py-0.5 rounded-full">{slide.tag}</span>
+                      </div>
+                      <h3 className="text-white font-bold text-lg truncate">{slide.headline.join(" ")}</h3>
+                      <p className="text-white/40 text-sm truncate">{slide.location} — {slide.subtitle}</p>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                      {/* Reorder */}
+                      <button onClick={() => handleMoveSlide(idx, "up")} disabled={isPending || idx === 0} className="px-2 py-1.5 text-xs font-bold rounded-lg bg-white/10 text-white/60 hover:bg-white/20 transition disabled:opacity-30" title="Move up">
+                        ↑
+                      </button>
+                      <button onClick={() => handleMoveSlide(idx, "down")} disabled={isPending || idx === slides.length - 1} className="px-2 py-1.5 text-xs font-bold rounded-lg bg-white/10 text-white/60 hover:bg-white/20 transition disabled:opacity-30" title="Move down">
+                        ↓
+                      </button>
+                      <button onClick={() => openEditSlide(slide)} disabled={isPending} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-accent/20 text-accent hover:bg-accent/30 transition disabled:opacity-50">
+                        Edit
+                      </button>
+                      <button onClick={() => handleToggleSlide(slide.id, slide.is_active)} disabled={isPending} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-white/10 text-white/60 hover:text-white hover:bg-white/20 transition disabled:opacity-50">
+                        {slide.is_active ? "Deactivate" : "Activate"}
+                      </button>
+                      <button onClick={() => handleDeleteSlide(slide.id)} disabled={isPending} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition disabled:opacity-50">
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══════════ STATS TAB ═══════════ */}
+      {tab === "stats" && (
+        <div>
+          {!editingStat && (
+            <button
+              onClick={() => { setShowStatForm(!showStatForm); setError(null); }}
+              className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
+            >
+              {showStatForm ? "Cancel" : "+ New Stat"}
+            </button>
+          )}
+
+          {showStatForm && !editingStat && renderStatForm("create")}
+          {editingStat && renderStatForm("edit", editingStat)}
+
+          {stats.length === 0 ? (
+            <p className="text-white/30 text-sm">No stats yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {stats.map((stat) => (
+                <div
+                  key={stat.id}
+                  className={`bg-white/[0.05] border rounded-2xl p-4 flex items-center justify-between transition ${
+                    stat.is_active ? "border-white/10" : "border-white/5 opacity-50"
+                  } ${editingStat?.id === stat.id ? "ring-2 ring-accent" : ""}`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-accent font-extrabold text-xl" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                      {stat.value}
+                    </span>
+                    <span className="text-white/60 text-sm">{stat.label}</span>
+                    {!stat.is_active && (
+                      <span className="text-[10px] font-bold uppercase tracking-widest bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">Inactive</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => { setEditingStat(stat); setShowStatForm(false); setError(null); }} disabled={isPending} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-accent/20 text-accent hover:bg-accent/30 transition disabled:opacity-50">
+                      Edit
+                    </button>
+                    <button onClick={() => handleToggleStat(stat.id, stat.is_active)} disabled={isPending} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-white/10 text-white/60 hover:text-white hover:bg-white/20 transition disabled:opacity-50">
+                      {stat.is_active ? "Deactivate" : "Activate"}
+                    </button>
+                    <button onClick={() => handleDeleteStat(stat.id)} disabled={isPending} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition disabled:opacity-50">
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
