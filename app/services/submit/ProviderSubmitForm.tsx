@@ -3,6 +3,8 @@
 import { useFormState, useFormStatus } from "react-dom";
 import { submitProviderRequest } from "./actions";
 import Link from "next/link";
+import { useState } from "react";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 interface Category {
   id: string;
@@ -28,6 +30,7 @@ function SubmitBtn() {
 
 export default function ProviderSubmitForm({ categories }: { categories: Category[] }) {
   const [state, formAction] = useFormState(submitProviderRequest, initialState);
+  const [imageUrl, setImageUrl] = useState("");
 
   return (
     <form action={formAction} className="space-y-5">
@@ -118,17 +121,17 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
           />
         </div>
 
-        {/* Logo / Image URL */}
+        {/* Logo / Image Upload */}
         <div>
           <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
-            Logo / Photo URL
+            Logo / Photo
           </label>
-          <input
-            name="image_url"
-            type="url"
-            placeholder="https://yoursite.com/logo.jpg"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
+          <ImageUpload
+            bucket="provider-images"
+            folder="submissions"
+            onUpload={(url) => setImageUrl(url)}
           />
+          <input type="hidden" name="image_url" value={imageUrl} />
         </div>
 
         {/* Contact info divider */}

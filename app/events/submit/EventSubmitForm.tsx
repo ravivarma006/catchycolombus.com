@@ -3,6 +3,8 @@
 import { useFormState, useFormStatus } from "react-dom";
 import { submitEventRequest } from "./actions";
 import Link from "next/link";
+import { useState } from "react";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 const initialState = { error: "" };
 
@@ -21,6 +23,7 @@ function SubmitBtn() {
 
 export default function EventSubmitForm() {
   const [state, formAction] = useFormState(submitEventRequest, initialState);
+  const [imageUrl, setImageUrl] = useState("");
 
   return (
     <form action={formAction} className="space-y-5">
@@ -117,17 +120,17 @@ export default function EventSubmitForm() {
           />
         </div>
 
-        {/* Image URL */}
+        {/* Event Image Upload */}
         <div>
           <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
-            Event Image URL
+            Event Image
           </label>
-          <input
-            name="image_url"
-            type="url"
-            placeholder="https://yoursite.com/event-flyer.jpg"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
+          <ImageUpload
+            bucket="event-images"
+            folder="submissions"
+            onUpload={(url) => setImageUrl(url)}
           />
+          <input type="hidden" name="image_url" value={imageUrl} />
         </div>
 
         {/* Divider */}

@@ -19,70 +19,103 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8">
-        <h1 className="text-2xl font-bold text-primary mb-2 text-center">
-          Sign In
-        </h1>
-        <p className="text-sm text-gray-500 text-center mb-6">
-          Welcome back to Catch Columbus
-        </p>
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-12"
+      style={{
+        background:
+          "linear-gradient(135deg, #020C1B 0%, #0D1B3E 50%, #0A0E27 100%)",
+      }}
+    >
+      {/* Ambient blobs */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-15%] left-[-10%] w-[55%] h-[55%] rounded-full bg-blue-500/20 blur-[130px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-amber-400/10 blur-[130px]" />
+      </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
-
-        <form action={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              name="email"
-              type="email"
-              required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              name="password"
-              type="password"
-              required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-
-          <div className="flex justify-end">
-            <Link
-              href="/auth/forgot-password"
-              className="text-xs text-gray-400 hover:text-primary transition"
+      <div className="relative z-10 w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/">
+            <span
+              className="text-3xl font-black text-white tracking-tight"
+              style={{ fontFamily: "'Outfit', sans-serif" }}
             >
-              Forgot password?
-            </Link>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-primary text-white rounded-lg py-2 font-semibold hover:bg-blue-900 transition disabled:opacity-60"
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-gray-500 mt-4">
-          Don&apos;t have an account?{" "}
-          <Link href="/auth/signup" className="text-accent font-medium hover:underline">
-            Sign up
+              Catch <span className="text-accent">Columbus</span>
+            </span>
           </Link>
-        </p>
+        </div>
+
+        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-3xl p-8">
+          <h1
+            className="text-2xl font-bold text-white mb-1 text-center"
+            style={{ fontFamily: "'Outfit', sans-serif" }}
+          >
+            Welcome back
+          </h1>
+          <p className="text-sm text-white/40 text-center mb-7">
+            Sign in to your account
+          </p>
+
+          {error && (
+            <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm">
+              {error}
+            </div>
+          )}
+
+          <form action={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
+                Email
+              </label>
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="you@example.com"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-bold text-white/50 uppercase tracking-widest">
+                  Password
+                </label>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-xs text-white/30 hover:text-accent transition"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <input
+                name="password"
+                type="password"
+                required
+                placeholder="••••••••"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-accent hover:bg-yellow-400 disabled:opacity-60 text-[#020C1B] font-black text-sm py-3.5 rounded-xl transition-all hover:scale-[1.01] active:scale-95 mt-2"
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-white/40 mt-6">
+            Don&apos;t have an account?{" "}
+            <Link
+              href="/auth/signup"
+              className="text-accent font-semibold hover:underline"
+            >
+              Sign up
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
