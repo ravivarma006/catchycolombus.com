@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { sendEmail, welcomeEmailHtml } from "@/lib/email";
 
 export async function subscribe(
   formData: FormData
@@ -23,6 +24,13 @@ export async function subscribe(
     console.error("[subscribe]", error.message);
     return { error: "Something went wrong. Please try again." };
   }
+
+  // Send welcome email (fire-and-forget — don't block on email failure)
+  sendEmail({
+    to: email,
+    subject: "Welcome to Catch Columbus! 🎉",
+    html: welcomeEmailHtml(email),
+  }).catch((err) => console.error("[subscribe] welcome email failed:", err));
 
   return { success: true };
 }

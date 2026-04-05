@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import CouponsContent from "@/components/coupons/CouponsContent";
 import type { Coupon } from "@/components/coupons/CouponCard";
 
+export const revalidate = 300; // 5 minutes
+
 interface CouponCategory {
   id: string;
   name: string;

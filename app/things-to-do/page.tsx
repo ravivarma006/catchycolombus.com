@@ -3,6 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 
+export const revalidate = 300; // 5 minutes
+
 export const metadata: Metadata = {
   title: "Things to Do in Columbus — Catch Columbus",
   description:

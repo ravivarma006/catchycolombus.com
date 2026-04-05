@@ -4,6 +4,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 import { CouponCopyBox } from "@/components/coupons/CouponCard";
+import RedeemTracker from "@/components/coupons/RedeemTracker";
 import { CATEGORY_GRADIENTS } from "@/lib/coupon-utils";
 
 interface CouponDetail {
@@ -18,6 +19,11 @@ interface CouponDetail {
   image_url: string | null;
   social_links: Record<string, string> | null;
   coupon_categories: { name: string; slug: string } | null;
+  expires_at: string | null;
+  discount_type: string | null;
+  discount_value: number | null;
+  current_redemptions: number | null;
+  max_redemptions: number | null;
 }
 
 export async function generateMetadata({
@@ -55,6 +61,8 @@ export default async function CouponDetailPage({
     .select(
       `id, product_service_name, phone, email, address,
        description, coupon_code, website, image_url, social_links,
+       expires_at, discount_type, discount_value,
+       current_redemptions, max_redemptions,
        coupon_categories ( name, slug )`
     )
     .eq("id", params.id)
@@ -248,7 +256,7 @@ export default async function CouponDetailPage({
                 Your Coupon
               </h2>
               {c.coupon_code ? (
-                <CouponCopyBox code={c.coupon_code} large />
+                <RedeemTracker couponId={c.id} code={c.coupon_code} />
               ) : (
                 <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-center">
                   <span className="text-white/70 font-semibold text-sm">
@@ -257,6 +265,21 @@ export default async function CouponDetailPage({
                     to redeem
                   </span>
                 </div>
+              )}
+
+              {/* Redemption stats */}
+              {(c.current_redemptions ?? 0) > 0 && (
+                <p className="text-xs text-white/30 text-center mt-3">
+                  🔥 {c.current_redemptions} {c.current_redemptions === 1 ? "person has" : "people have"} redeemed this deal
+                  {c.max_redemptions ? ` · ${c.max_redemptions - (c.current_redemptions ?? 0)} left` : ""}
+                </p>
+              )}
+
+              {/* Expiry */}
+              {c.expires_at && (
+                <p className="text-xs text-white/30 text-center mt-1">
+                  Expires {new Date(c.expires_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                </p>
               )}
             </div>
 

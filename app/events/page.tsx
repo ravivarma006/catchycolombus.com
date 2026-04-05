@@ -3,6 +3,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import EventsContent, { type Event } from "@/components/events/EventsContent";
 
+export const revalidate = 300; // 5 minutes
+
 export const metadata: Metadata = {
   title: "Events in Columbus — Catch Columbus",
   description:

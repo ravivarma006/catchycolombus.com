@@ -3,6 +3,9 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AccentSwitcher from "@/components/AccentSwitcher";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import StickyDealBar from "@/components/StickyDealBar";
+import ExitIntentPopup from "@/components/ExitIntentPopup";
 import { createClient } from "@/lib/supabase/server";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://catchcolumbus.com";
@@ -102,10 +105,13 @@ export default async function RootLayout({
         />
       </head>
       <body className="antialiased" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <GoogleAnalytics />
         <Navbar user={navUser} />
         <main>{children}</main>
         <Footer />
         <AccentSwitcher />
+        <StickyDealBar />
+        <ExitIntentPopup />
       </body>
     </html>
   );

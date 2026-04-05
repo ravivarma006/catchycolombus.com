@@ -32,7 +32,7 @@ const cardVariants = {
 };
 
 /* ── Named export: used by detail page too ── */
-export function CouponCopyBox({ code, large = false }: { code: string; large?: boolean }) {
+export function CouponCopyBox({ code, large = false, onCopy }: { code: string; large?: boolean; onCopy?: () => void }) {
   const [copied, setCopied] = useState(false);
 
   return (
@@ -47,6 +47,7 @@ export function CouponCopyBox({ code, large = false }: { code: string; large?: b
           navigator.clipboard.writeText(code).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
+            onCopy?.();
           });
         }}
         className={`shrink-0 font-bold rounded-xl bg-accent text-[#020C1B] hover:bg-yellow-400 active:scale-95 transition-all duration-150 text-center ${large ? "text-sm px-5 py-2.5 min-w-[110px]" : "text-xs px-3 py-1.5 min-w-[72px]"}`}

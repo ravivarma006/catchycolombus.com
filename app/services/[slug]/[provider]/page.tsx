@@ -73,7 +73,27 @@ export default async function ProviderDetailPage({
   const socials = p.social_links || {};
   const hasSocials = Object.values(socials).some(Boolean);
 
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://catchcolumbus.com";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: p.name,
+    description: p.description ?? undefined,
+    image: p.image_url ?? undefined,
+    telephone: p.phone ?? undefined,
+    email: p.email ?? undefined,
+    url: p.website ?? `${SITE_URL}/services/${catSlug}/${p.slug}`,
+    address: p.address
+      ? { "@type": "PostalAddress", streetAddress: p.address, addressLocality: "Columbus", addressRegion: "OH", addressCountry: "US" }
+      : undefined,
+  };
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     <div
       className="min-h-screen"
       style={{ background: "linear-gradient(135deg, #020C1B 0%, #0D1B3E 50%, #0A0E27 100%)" }}
@@ -257,5 +277,6 @@ export default async function ProviderDetailPage({
         </div>
       </div>
     </div>
+    </>
   );
 }

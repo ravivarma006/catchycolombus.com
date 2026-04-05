@@ -2,6 +2,8 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 
+export const revalidate = 300; // 5 minutes
+
 export const metadata: Metadata = {
   title: "City Announcements — Catch Columbus",
   description: "Latest news and announcements from Columbus, Ohio.",

@@ -312,37 +312,50 @@ export default function HeroSection({ slides, stats }: HeroSectionProps) {
                       {slide.sub}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    <Link
-                      href="/events"
-                      id="hero-explore-events"
-                      className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-2xl transition-all duration-200 hover:scale-105 active:scale-95"
-                      style={{
-                        backgroundColor: "var(--accent)",
-                        color: "#0F4C5C",
-                        fontFamily: "'Inter', sans-serif",
-                        boxShadow: `0 8px 24px ${"var(--accent)"}66`,
-                      }}
-                    >
-                      Explore Events
-                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                      </svg>
-                    </Link>
-                    <Link
-                      href="/services"
-                      id="hero-browse-services"
-                      className="inline-flex items-center gap-2 font-semibold text-sm px-6 py-3 rounded-2xl transition-all duration-200 hover:scale-105 active:scale-95"
-                      style={{
-                        border: "1.5px solid rgba(255,255,255,0.30)",
-                        color: "rgba(255,255,255,0.85)",
-                        fontFamily: "'Inter', sans-serif",
-                        backgroundColor: "rgba(255,255,255,0.06)",
-                        backdropFilter: "blur(8px)",
-                      }}
-                    >
-                      Browse Services
-                    </Link>
+                  <div className="flex flex-col gap-3">
+                    {/* Value proposition badge */}
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
+                        style={{ backgroundColor: "rgba(255,255,255,0.12)", color: "var(--accent)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.15)" }}
+                      >
+                        <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 3.8 2.4-7.4L2 9.4h7.6z"/></svg>
+                        Save up to 40% on Columbus attractions
+                      </span>
+                      <span className="text-white/40 text-xs" style={{ fontFamily: "'Inter', sans-serif" }}>· Free to join</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Link
+                        href="/coupons"
+                        id="hero-get-free-deals"
+                        className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-2xl transition-all duration-200 hover:scale-105 active:scale-95"
+                        style={{
+                          backgroundColor: "var(--accent)",
+                          color: "#0F4C5C",
+                          fontFamily: "'Inter', sans-serif",
+                          boxShadow: `0 8px 24px ${"var(--accent)"}66`,
+                        }}
+                      >
+                        🎁 Get Free Deals
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                        </svg>
+                      </Link>
+                      <Link
+                        href="/events"
+                        id="hero-explore-events"
+                        className="inline-flex items-center gap-2 font-semibold text-sm px-6 py-3 rounded-2xl transition-all duration-200 hover:scale-105 active:scale-95"
+                        style={{
+                          border: "1.5px solid rgba(255,255,255,0.30)",
+                          color: "rgba(255,255,255,0.85)",
+                          fontFamily: "'Inter', sans-serif",
+                          backgroundColor: "rgba(255,255,255,0.06)",
+                          backdropFilter: "blur(8px)",
+                        }}
+                      >
+                        Explore Events
+                      </Link>
+                    </div>
                   </div>
                 </motion.div>
               </motion.div>

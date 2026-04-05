@@ -4,6 +4,7 @@ import CategoriesSection from "@/components/home/CategoriesSection";
 import ThingsToDoSection from "@/components/home/ThingsToDoSection";
 import AnnouncementsSection from "@/components/home/AnnouncementsSection";
 import EventsCalendarSection from "@/components/home/EventsCalendarSection";
+import TrustSection from "@/components/home/TrustSection";
 import SubscribeForm from "@/components/SubscribeForm";
 import BannersSection from "@/components/home/BannersSection";
 
@@ -67,6 +68,7 @@ export default async function Home() {
       }))} />
       <AnnouncementsSection announcements={announcements ?? []} />
       <EventsCalendarSection />
+      <TrustSection />
       <SubscribeForm />
       <BannersSection banners={banners ?? []} />
     </>

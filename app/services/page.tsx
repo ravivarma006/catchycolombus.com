@@ -21,26 +21,34 @@ interface Category {
   provider_count?: number;
 }
 
+export const revalidate = 300; // 5 minutes
+
 export default async function ServicesPage() {
   const supabase = createClient();
 
-  const { data: categories } = await supabase
-    .from("service_categories")
-    .select("id, name, slug, icon, description, display_order, image_url")
-    .eq("is_active", true)
-    .order("display_order", { ascending: true });
+  // Two queries instead of N+1: categories + all provider category_ids
+  const [{ data: categories }, { data: providerRows }] = await Promise.all([
+    supabase
+      .from("service_categories")
+      .select("id, name, slug, icon, description, display_order, image_url")
+      .eq("is_active", true)
+      .order("display_order", { ascending: true }),
+    supabase
+      .from("service_providers")
+      .select("category_id")
+      .eq("is_active", true),
+  ]);
 
-  // Get provider counts per category — all in parallel
-  const cats: Category[] = await Promise.all(
-    (categories ?? []).map(async (cat) => {
-      const { count } = await supabase
-        .from("service_providers")
-        .select("id", { count: "exact", head: true })
-        .eq("category_id", cat.id)
-        .eq("is_active", true);
-      return { ...cat, provider_count: count ?? 0 };
-    })
+  // Count providers per category in JS — O(n) single pass
+  const countMap = (providerRows ?? []).reduce<Record<string, number>>(
+    (acc, p) => { acc[p.category_id] = (acc[p.category_id] ?? 0) + 1; return acc; },
+    {}
   );
+
+  const cats: Category[] = (categories ?? []).map((cat) => ({
+    ...cat,
+    provider_count: countMap[cat.id] ?? 0,
+  }));
 
   return (
     <div

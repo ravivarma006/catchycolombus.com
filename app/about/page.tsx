@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import AboutContent from "@/components/about/AboutContent";
 
+export const revalidate = 3600; // 1 hour
+
 export const metadata: Metadata = {
   title: "About Columbus — Catch Columbus",
   description:

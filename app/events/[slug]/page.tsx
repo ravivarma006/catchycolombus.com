@@ -77,8 +77,35 @@ export default async function EventDetailPage({
   if (!event) notFound();
 
   const isFree = event.price?.toLowerCase() === "free";
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://catchcolumbus.com";
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: event.title,
+    description: event.description ?? undefined,
+    startDate: event.event_time
+      ? `${event.event_date}T${event.event_time}`
+      : event.event_date,
+    location: event.location
+      ? { "@type": "Place", name: event.location, address: { "@type": "PostalAddress", addressLocality: "Columbus", addressRegion: "OH" } }
+      : undefined,
+    image: event.image_url ?? undefined,
+    url: `${SITE_URL}/events/${event.slug}`,
+    organizer: { "@type": "Organization", name: "Catch Columbus", url: SITE_URL },
+    offers: {
+      "@type": "Offer",
+      price: isFree ? "0" : event.price,
+      priceCurrency: "USD",
+    },
+  };
 
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero */}
@@ -236,5 +263,6 @@ export default async function EventDetailPage({
         </div>
       </div>
     </div>
+    </>
   );
 }
