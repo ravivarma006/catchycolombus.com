@@ -41,6 +41,36 @@ export async function signup(formData: FormData) {
   redirect("/dashboard");
 }
 
+export async function forgotPassword(formData: FormData) {
+  const supabase = createClient();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(
+    formData.get("email") as string,
+    { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://catchcolumbus.com"}/auth/reset-password` }
+  );
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true };
+}
+
+export async function resetPassword(formData: FormData) {
+  const supabase = createClient();
+
+  const { error } = await supabase.auth.updateUser({
+    password: formData.get("password") as string,
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/dashboard");
+}
+
 export async function logout() {
   const supabase = createClient();
   await supabase.auth.signOut();

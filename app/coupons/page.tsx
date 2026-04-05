@@ -26,14 +26,17 @@ export default async function CouponsPage() {
     .eq("is_active", true)
     .order("display_order", { ascending: true });
 
+  const today = new Date().toISOString().split("T")[0];
   const { data: coupons } = await supabase
     .from("coupons")
     .select(
       `id, category_id, product_service_name, phone, email,
        address, description, coupon_code, website, image_url, social_links,
+       expires_at, discount_type, discount_value,
        coupon_categories ( name, slug )`
     )
     .eq("is_active", true)
+    .or(`expires_at.is.null,expires_at.gte.${today}`)
     .order("approved_at", { ascending: false });
 
   return (

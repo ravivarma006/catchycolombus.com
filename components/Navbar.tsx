@@ -2,7 +2,17 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { logout } from "@/app/auth/actions";
+
+const NAV_LINKS = [
+  { href: "/events", label: "Events" },
+  { href: "/things-to-do", label: "Things to Do" },
+  { href: "/services", label: "Services" },
+  { href: "/coupons", label: "Coupons" },
+  { href: "/announcements", label: "News" },
+  { href: "/about", label: "About" },
+];
 
 interface NavbarProps {
   user: { email?: string; role?: string } | null;
@@ -10,6 +20,10 @@ interface NavbarProps {
 
 export default function Navbar({ user }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(href + "/");
 
   return (
     <nav className="bg-white text-gray-800 shadow-sm border-b border-gray-100">
@@ -24,12 +38,19 @@ export default function Navbar({ user }: NavbarProps) {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-6 text-sm font-semibold">
-            <Link href="/events" className="hover:text-primary transition">Events</Link>
-            <Link href="/things-to-do" className="hover:text-primary transition">Things to Do</Link>
-            <Link href="/services" className="hover:text-primary transition">Services</Link>
-            <Link href="/coupons" className="hover:text-primary transition">Coupons</Link>
-            <Link href="/announcements" className="hover:text-primary transition">News</Link>
-            <Link href="/about" className="hover:text-primary transition">About</Link>
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`hover:text-primary transition ${
+                  isActive(link.href)
+                    ? "text-primary border-b-2 border-accent pb-0.5"
+                    : ""
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
           {/* Auth Buttons */}
@@ -85,12 +106,19 @@ export default function Navbar({ user }: NavbarProps) {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 px-4 py-3 space-y-2 text-sm font-semibold">
-          <Link href="/events" className="block text-gray-700 hover:text-primary hover:bg-gray-50 px-2 py-1.5 rounded-md transition">Events</Link>
-          <Link href="/things-to-do" className="block text-gray-700 hover:text-primary hover:bg-gray-50 px-2 py-1.5 rounded-md transition">Things to Do</Link>
-          <Link href="/services" className="block text-gray-700 hover:text-primary hover:bg-gray-50 px-2 py-1.5 rounded-md transition">Services</Link>
-          <Link href="/coupons" className="block text-gray-700 hover:text-primary hover:bg-gray-50 px-2 py-1.5 rounded-md transition">Coupons</Link>
-          <Link href="/announcements" className="block text-gray-700 hover:text-primary hover:bg-gray-50 px-2 py-1.5 rounded-md transition">News</Link>
-          <Link href="/about" className="block text-gray-700 hover:text-primary hover:bg-gray-50 px-2 py-1.5 rounded-md transition">About</Link>
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`block hover:text-primary hover:bg-gray-50 px-2 py-1.5 rounded-md transition ${
+                isActive(link.href)
+                  ? "text-primary bg-gray-50 border-l-2 border-accent"
+                  : "text-gray-700"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
           <div className="pt-2 mt-2 border-t border-gray-100">
             {user ? (
               <>
