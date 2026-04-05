@@ -19,7 +19,7 @@ export default async function AdminCouponsPage() {
       .order("display_order", { ascending: true }),
     supabase
       .from("coupons")
-      .select("id, product_service_name, coupon_code, phone, email, address, description, website, image_url, is_active, category_id, category:coupon_categories(name)")
+      .select("id, product_service_name, coupon_code, phone, email, address, description, website, image_url, is_active, category_id, is_premium, expires_at, max_redemptions, current_redemptions, category:coupon_categories(name)")
       .order("product_service_name", { ascending: true }),
   ]);
 
@@ -39,6 +39,8 @@ export default async function AdminCouponsPage() {
     phone: string | null; email: string | null; address: string | null;
     description: string | null; website: string | null; image_url: string | null;
     is_active: boolean; category_id: string | null; category: { name: string } | null;
+    is_premium: boolean; expires_at: string | null; max_redemptions: number | null;
+    current_redemptions: number;
   }>;
 
   return (

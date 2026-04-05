@@ -24,9 +24,10 @@ const optionalUrl = z
 const optionalPhone = z
   .string()
   .trim()
-  .refine((v) => !v || /^[\d\s().+\-]{7,20}$/.test(v), {
-    message: "Enter a valid phone number",
-  })
+  .refine(
+    (v) => !v || (/^[\d\s().+\-]{7,20}$/.test(v) && v.replace(/\D/g, "").length >= 10),
+    { message: "Enter a valid phone number (at least 10 digits)" }
+  )
   .optional()
   .or(z.literal(""));
 

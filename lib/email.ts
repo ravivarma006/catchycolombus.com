@@ -50,6 +50,14 @@ export async function sendEmail({
   return { success: true };
 }
 
+// --- Utilities ---
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!)
+  );
+}
+
 // --- Email templates ---
 
 export function welcomeEmailHtml(email: string): string {
@@ -100,9 +108,9 @@ export function dealAlertEmailHtml(deals: { title: string; description: string; 
     .map(
       (d) => `
     <div style="border:1px solid #f3f4f6;border-radius:12px;padding:20px;margin-bottom:16px;">
-      <h3 style="font-size:16px;font-weight:700;color:#1A1A2E;margin:0 0 6px;">${d.title}</h3>
-      <p style="color:#6b7280;font-size:14px;margin:0 0 12px;">${d.description}</p>
-      ${d.code ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;font-family:monospace;font-weight:700;font-size:13px;padding:4px 12px;border-radius:6px;margin-bottom:12px;">${d.code}</span>` : ""}
+      <h3 style="font-size:16px;font-weight:700;color:#1A1A2E;margin:0 0 6px;">${escapeHtml(d.title)}</h3>
+      <p style="color:#6b7280;font-size:14px;margin:0 0 12px;">${escapeHtml(d.description)}</p>
+      ${d.code ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;font-family:monospace;font-weight:700;font-size:13px;padding:4px 12px;border-radius:6px;margin-bottom:12px;">${escapeHtml(d.code)}</span>` : ""}
       <a href="${d.url}" style="display:inline-block;color:#0F4C5C;font-weight:600;font-size:13px;text-decoration:none;">View Deal →</a>
     </div>`
     )

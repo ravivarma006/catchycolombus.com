@@ -72,6 +72,7 @@ export default async function CouponDetailPage({
   if (!coupon) notFound();
 
   const c = coupon as unknown as CouponDetail;
+  const isExpired = c.expires_at ? new Date(c.expires_at) < new Date() : false;
   const catSlug = c.coupon_categories?.slug ?? "default";
   const gen = CATEGORY_GRADIENTS[catSlug] ?? CATEGORY_GRADIENTS.default;
   const socials = c.social_links || {};
@@ -91,6 +92,18 @@ export default async function CouponDetailPage({
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-amber-400/15 blur-[130px]" />
         <div className="absolute top-[40%] left-[35%] w-[40%] h-[40%] rounded-full bg-violet-600/15 blur-[110px]" />
       </div>
+
+      {/* Expired banner */}
+      {isExpired && (
+        <div className="relative z-10 max-w-4xl mx-auto px-4 pt-4">
+          <div className="bg-red-500/20 border border-red-500/30 rounded-2xl p-4 flex items-center gap-3">
+            <span className="text-red-400 text-lg">⚠️</span>
+            <p className="text-red-300 text-sm font-semibold">
+              This coupon expired on {new Date(c.expires_at!).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}. It may no longer be valid.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Hero */}
       <div className="relative z-10 w-full h-64 md:h-80 overflow-hidden">

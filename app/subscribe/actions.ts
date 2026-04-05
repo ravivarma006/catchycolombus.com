@@ -14,6 +14,16 @@ export async function subscribe(
 
   const supabase = createClient();
 
+  // Rate limit: max 10 subscriptions per minute globally
+  const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString();
+  const { count: recentCount } = await supabase
+    .from("subscribers")
+    .select("id", { count: "exact", head: true })
+    .gte("created_at", oneMinuteAgo);
+  if ((recentCount ?? 0) >= 10) {
+    return { error: "Too many requests. Please try again later." };
+  }
+
   const { error } = await supabase.from("subscribers").insert({ email });
 
   if (error) {

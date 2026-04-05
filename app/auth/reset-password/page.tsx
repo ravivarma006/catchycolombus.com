@@ -22,6 +22,16 @@ export default function ResetPasswordPage() {
       return;
     }
 
+    if (!/[A-Z]/.test(password)) {
+      setError("Password must contain at least one uppercase letter.");
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setError("Password must contain at least one number.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     const result = await resetPassword(formData);
@@ -85,7 +95,7 @@ export default function ResetPasswordPage() {
                 type="password"
                 required
                 minLength={8}
-                placeholder="Min. 8 characters"
+                placeholder="Min. 8 chars, 1 uppercase, 1 number"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
               />
             </div>

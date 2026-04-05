@@ -137,6 +137,12 @@ export default function HeroSection({ slides, stats }: HeroSectionProps) {
   const slide = slides[active];
   const showText = phase === "show";
 
+  /* Sanitize overlay colors to prevent CSS injection */
+  const isValidColor = (c: string) =>
+    /^(#[0-9a-fA-F]{3,8}|rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*[\d.]+\s*)?\))$/.test(c.trim());
+  const safeOverlayFrom = isValidColor(slide.overlayFrom) ? slide.overlayFrom : "rgba(0,0,0,0.85)";
+  const safeOverlayTo = isValidColor(slide.overlayTo) ? slide.overlayTo : "rgba(0,0,0,0.40)";
+
   /* pad slide number */
   const num = String(active + 1).padStart(2, "0");
   const total = String(slides.length).padStart(2, "0");
@@ -159,26 +165,30 @@ export default function HeroSection({ slides, stats }: HeroSectionProps) {
         style={{ x: imgX, y: imgY, scale: 1.06 }}
       >
         <AnimatePresence mode="sync">
-          <motion.div
-            key={`img-${active}`}
-            className="absolute inset-0"
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{
-              opacity: 1,
-              scale: 1.10,
-              transition: { opacity: { duration: 0.9 }, scale: { duration: 8, ease: "linear" } },
-            }}
-            exit={{ opacity: 0, transition: { duration: 0.9 } }}
-          >
-            <Image
-              src={slide.image}
-              alt={slide.location}
-              fill
-              priority={active === 0}
-              className="object-cover object-center"
-              sizes="100vw"
-            />
-          </motion.div>
+          {slides
+            .filter((_, i) => i === active || i === (active + 1) % slides.length)
+            .map((s) => (
+              <motion.div
+                key={`img-${s.id}`}
+                className="absolute inset-0"
+                initial={{ opacity: s.id === slide.id ? 0 : 0, scale: 1.04 }}
+                animate={s.id === slide.id ? {
+                  opacity: 1,
+                  scale: 1.10,
+                  transition: { opacity: { duration: 0.9 }, scale: { duration: 8, ease: "linear" } },
+                } : { opacity: 0 }}
+                exit={{ opacity: 0, transition: { duration: 0.9 } }}
+              >
+                <Image
+                  src={s.image}
+                  alt={s.location}
+                  fill
+                  priority={s.id === slides[0]?.id}
+                  className="object-cover object-center"
+                  sizes="100vw"
+                />
+              </motion.div>
+            ))}
         </AnimatePresence>
       </motion.div>
 
@@ -191,7 +201,7 @@ export default function HeroSection({ slides, stats }: HeroSectionProps) {
           animate={{ opacity: 1, transition: { duration: 0.9 } }}
           exit={{ opacity: 0, transition: { duration: 0.5 } }}
           style={{
-            background: `linear-gradient(105deg, ${slide.overlayFrom} 0%, ${slide.overlayTo} 35%, rgba(0,0,0,0.20) 70%, rgba(0,0,0,0.05) 100%)`,
+            background: `linear-gradient(105deg, ${safeOverlayFrom} 0%, ${safeOverlayTo} 35%, rgba(0,0,0,0.20) 70%, rgba(0,0,0,0.05) 100%)`,
           }}
         />
       </AnimatePresence>

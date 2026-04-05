@@ -35,6 +35,10 @@ interface ApprovedCoupon {
   is_active: boolean;
   category_id: string | null;
   category: { name: string } | null;
+  is_premium: boolean;
+  expires_at: string | null;
+  max_redemptions: number | null;
+  current_redemptions: number;
 }
 
 const INPUT_CLS = "w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white text-sm placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-accent";
@@ -203,6 +207,21 @@ export default function CouponsManager({
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Website</label>
           <input name="website" type="url" defaultValue={coupon.website || ""} className={INPUT_CLS} placeholder="https://..." />
         </div>
+        <div className="flex items-center gap-3 pt-6">
+          <input type="hidden" name="is_premium" value="false" />
+          <input type="checkbox" name="is_premium" value="true" defaultChecked={coupon.is_premium} id={`premium-${coupon.id}`} className="w-5 h-5 accent-yellow-400 bg-white/10" />
+          <label htmlFor={`premium-${coupon.id}`} className="text-sm font-bold text-yellow-400 uppercase tracking-widest">
+            Premium Deal (Paid Members Only)
+          </label>
+        </div>
+        <div>
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Expiration Date</label>
+          <input name="expires_at" type="date" defaultValue={coupon.expires_at || ""} className={INPUT_CLS} />
+        </div>
+        <div>
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Max Redemptions</label>
+          <input name="max_redemptions" type="number" min="1" defaultValue={coupon.max_redemptions || ""} className={INPUT_CLS} placeholder="Leave blank for unlimited" />
+        </div>
         <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Image</label>
           <ImageUpload bucket="coupon-images" folder="coupons" onUpload={setEditCouponImageUrl} currentUrl={editCouponImageUrl} />
@@ -346,6 +365,21 @@ export default function CouponsManager({
                         {!coupon.is_active && (
                           <span className="text-[10px] font-bold uppercase tracking-widest bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">
                             Inactive
+                          </span>
+                        )}
+                        {coupon.is_premium && (
+                          <span className="text-[10px] font-bold uppercase tracking-widest bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full ring-1 ring-yellow-400/50">
+                            🌟 Premium
+                          </span>
+                        )}
+                        {coupon.expires_at && (
+                          <span className="text-[10px] font-bold uppercase tracking-widest bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">
+                            Expires: {new Date(coupon.expires_at).toLocaleDateString()}
+                          </span>
+                        )}
+                        {coupon.max_redemptions && (
+                          <span className="text-[10px] font-bold uppercase tracking-widest bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full">
+                            {coupon.current_redemptions} / {coupon.max_redemptions} Uses
                           </span>
                         )}
                       </div>

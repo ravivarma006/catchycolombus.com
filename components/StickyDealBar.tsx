@@ -10,10 +10,13 @@ export default function StickyDealBar() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("stickyBarDismissed")) {
+    // Check if dismissed in this session only (sessionStorage resets on tab close)
+    if (sessionStorage.getItem("stickyBarDismissed")) {
       setDismissed(true);
       return;
     }
+    // Check initial scroll position on mount
+    setVisible(window.scrollY > 300);
     const handler = () => setVisible(window.scrollY > 300);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
@@ -21,7 +24,7 @@ export default function StickyDealBar() {
 
   function dismiss() {
     setDismissed(true);
-    if (typeof window !== "undefined") localStorage.setItem("stickyBarDismissed", "1");
+    sessionStorage.setItem("stickyBarDismissed", "1");
   }
 
   async function handleSubmit(e: React.FormEvent) {

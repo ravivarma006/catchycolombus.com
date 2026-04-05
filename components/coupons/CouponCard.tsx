@@ -20,7 +20,14 @@ export interface Coupon {
   image_url: string | null;
   social_links: Record<string, string> | null;
   coupon_categories: { name: string; slug: string } | null;
+  is_premium?: boolean;
+  expires_at?: string | null;
+  max_redemptions?: number | null;
+  current_redemptions?: number;
 }
+
+import CountdownTimer from "./CountdownTimer";
+import ScarcityBadge from "./ScarcityBadge";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -96,18 +103,29 @@ export default function CouponCard({ coupon, index }: { coupon: Coupon; index: n
 
             {/* Category badge */}
             {coupon.coupon_categories?.name && (
-              <span className="absolute top-3 left-3 text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-sm text-white/90 border border-white/10">
+              <span className="absolute top-3 left-3 text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-sm text-white/90 border border-white/10 z-10">
                 {coupon.coupon_categories.name}
               </span>
+            )}
+
+            {/* Scarcity Badge */}
+            {coupon.max_redemptions !== undefined && typeof coupon.current_redemptions === 'number' && (
+              <ScarcityBadge 
+                maxRedemptions={coupon.max_redemptions} 
+                currentRedemptions={coupon.current_redemptions} 
+              />
             )}
           </div>
 
           {/* Card body */}
-          <div className="p-5">
+          <div className="p-5 flex flex-col h-full flex-1">
             <h3
-              className="text-base font-black text-white mb-1 leading-snug line-clamp-1 group-hover:text-accent transition-colors duration-300"
+              className="text-base font-black text-white mb-1 leading-snug line-clamp-1 group-hover:text-accent transition-colors duration-300 flex items-center gap-2"
               style={{ fontFamily: "'Outfit', sans-serif" }}
             >
+              {coupon.is_premium && (
+                <span className="text-yellow-400 shrink-0" title="Premium Members Only">🌟</span>
+              )}
               {coupon.product_service_name}
             </h3>
 
@@ -123,10 +141,15 @@ export default function CouponCard({ coupon, index }: { coupon: Coupon; index: n
                 <CouponCopyBox code={coupon.coupon_code} />
               </div>
             ) : (
-              <span className="inline-block text-[11px] font-bold px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/70">
+              <span className="inline-block self-start text-[11px] font-bold px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/70">
                 Mention Catch Columbus
               </span>
             )}
+
+            {/* Countdown Timer */}
+            <div className="mt-auto">
+              <CountdownTimer expiresAt={coupon.expires_at || null} />
+            </div>
           </div>
 
         </div>

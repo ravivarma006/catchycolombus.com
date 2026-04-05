@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { updateEvent, toggleEventActive, deleteEvent } from "@/app/admin/actions";
+import { updateEvent, toggleEventActive, deleteEvent, createEvent } from "@/app/admin/actions";
 import ImageUpload from "@/components/admin/ImageUpload";
 
 interface ApprovedEvent {
@@ -28,6 +28,8 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
   const [error, setError] = useState<string | null>(null);
   const [editingEvent, setEditingEvent] = useState<ApprovedEvent | null>(null);
   const [editImageUrl, setEditImageUrl] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [createImageUrl, setCreateImageUrl] = useState("");
 
   // ── Handlers ──
 
@@ -60,6 +62,18 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
     if (!confirm("Delete this event? This cannot be undone.")) return;
     startTransition(async () => {
       await deleteEvent(id);
+    });
+  }
+
+  function handleCreate(formData: FormData) {
+    setError(null);
+    startTransition(async () => {
+      const result = await createEvent(formData);
+      if (result.error) setError(result.error);
+      else {
+        setIsCreating(false);
+        setCreateImageUrl("");
+      }
     });
   }
 
@@ -221,12 +235,117 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
     );
   }
 
+  function renderCreateForm() {
+    return (
+      <form
+        action={handleCreate}
+        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+      >
+        <div className="md:col-span-2">
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
+            Title *
+          </label>
+          <input name="title" required className={INPUT_CLS} placeholder="Event title" />
+        </div>
+
+        <div>
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
+            Date *
+          </label>
+          <input name="event_date" type="date" required className={INPUT_CLS} />
+        </div>
+
+        <div>
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
+            Time
+          </label>
+          <input name="event_time" className={INPUT_CLS} placeholder="e.g. 7:00 PM - 10:00 PM" />
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
+            Location
+          </label>
+          <input name="location" className={INPUT_CLS} placeholder="Venue name and address" />
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
+            Description
+          </label>
+          <textarea name="description" rows={3} className={`${INPUT_CLS} resize-none`} placeholder="Event description..." />
+        </div>
+
+        <div>
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
+            Price
+          </label>
+          <input name="price" className={INPUT_CLS} placeholder="e.g. Free, $25" />
+        </div>
+
+        <div>
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
+            Website
+          </label>
+          <input name="website" type="url" className={INPUT_CLS} placeholder="https://..." />
+        </div>
+
+        <div>
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
+            Category
+          </label>
+          <input name="category" className={INPUT_CLS} placeholder="e.g. SPORTS, MUSIC" />
+        </div>
+
+        <div>
+          <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
+            Image
+          </label>
+          <ImageUpload
+            bucket="event-images"
+            folder="events"
+            onUpload={setCreateImageUrl}
+            currentUrl={createImageUrl}
+          />
+          <input type="hidden" name="image_url" value={createImageUrl} />
+        </div>
+
+        <div className="flex items-center gap-2 md:col-span-2">
+          <input type="checkbox" name="is_featured" value="true" id="create_is_featured" className="rounded border-white/20" />
+          <label htmlFor="create_is_featured" className="text-white/60 text-sm">
+            Featured event
+          </label>
+        </div>
+
+        <div className="md:col-span-2 flex gap-3">
+          <button type="submit" disabled={isPending} className="px-6 py-2.5 bg-green-500 text-white font-bold rounded-xl text-sm hover:bg-green-400 transition disabled:opacity-50">
+            {isPending ? "Creating..." : "Create Event"}
+          </button>
+          <button type="button" onClick={() => { setIsCreating(false); setCreateImageUrl(""); }} className="px-6 py-2.5 bg-white/10 text-white/60 font-bold rounded-xl text-sm hover:bg-white/20 transition">
+            Cancel
+          </button>
+        </div>
+      </form>
+    );
+  }
+
   // ── Render ──
 
   return (
     <div>
-      {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
+      <div className="flex justify-between items-center mb-4">
+        {error && <p className="text-red-400 text-sm">{error}</p>}
+        {!isCreating && !editingEvent && (
+          <button
+            onClick={() => setIsCreating(true)}
+            className="px-4 py-2 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition ml-auto"
+          >
+            + Add New Event
+          </button>
+        )}
+      </div>
 
+      {isCreating && renderCreateForm()}
       {editingEvent && renderEditForm(editingEvent)}
 
       {events.length === 0 ? (

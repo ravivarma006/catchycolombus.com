@@ -328,6 +328,45 @@ export async function updateEvent(
   return { success: true };
 }
 
+export async function createEvent(
+  formData: FormData
+): Promise<{ error?: string; success?: boolean }> {
+  const { supabase, error: authError } = await requireAdmin();
+  if (authError) return { error: authError };
+
+  const title = (formData.get("title") as string)?.trim();
+  if (!title) return { error: "Event title is required." };
+
+  const slug = await uniqueSlug(supabase, "events", title);
+
+  const { error } = await supabase
+    .from("events")
+    .insert({
+      title,
+      slug,
+      event_date: (formData.get("event_date") as string)?.trim() || null,
+      event_time: (formData.get("event_time") as string)?.trim() || null,
+      location: (formData.get("location") as string)?.trim() || null,
+      description: (formData.get("description") as string)?.trim() || null,
+      price: (formData.get("price") as string)?.trim() || null,
+      website: (formData.get("website") as string)?.trim() || null,
+      image_url: (formData.get("image_url") as string)?.trim() || null,
+      category: (formData.get("category") as string)?.trim() || null,
+      is_featured: formData.get("is_featured") === "true",
+      is_active: true,
+    });
+
+  if (error) {
+    console.error("[createEvent]", error.message);
+    return { error: "Could not create event." };
+  }
+
+  revalidatePath("/admin/events");
+  revalidatePath("/events");
+  revalidatePath("/");
+  return { success: true };
+}
+
 export async function toggleEventActive(
   id: string,
   currentActive: boolean
@@ -470,6 +509,9 @@ export async function updateCoupon(
       description: (formData.get("description") as string)?.trim() || null,
       website: (formData.get("website") as string)?.trim() || null,
       image_url: (formData.get("image_url") as string)?.trim() || null,
+      is_premium: formData.get("is_premium") === "true",
+      expires_at: (formData.get("expires_at") as string)?.trim() || null,
+      max_redemptions: parseInt(formData.get("max_redemptions") as string) || null,
     })
     .eq("id", id);
 
@@ -603,6 +645,15 @@ export async function deleteServiceCategory(
   const { supabase, error: authError } = await requireAdmin();
   if (authError) return { error: authError };
 
+  const { count } = await supabase
+    .from("service_providers")
+    .select("id", { count: "exact", head: true })
+    .eq("category_id", id)
+    .eq("is_active", true);
+  if ((count ?? 0) > 0) {
+    return { error: `Cannot delete — ${count} active provider(s) still use this category.` };
+  }
+
   const { error } = await supabase.from("service_categories").delete().eq("id", id);
   if (error) return { error: "Could not delete category." };
 
@@ -695,6 +746,15 @@ export async function deleteCouponCategory(
 ): Promise<{ error?: string; success?: boolean }> {
   const { supabase, error: authError } = await requireAdmin();
   if (authError) return { error: authError };
+
+  const { count } = await supabase
+    .from("coupons")
+    .select("id", { count: "exact", head: true })
+    .eq("category_id", id)
+    .eq("is_active", true);
+  if ((count ?? 0) > 0) {
+    return { error: `Cannot delete — ${count} active coupon(s) still use this category.` };
+  }
 
   const { error } = await supabase.from("coupon_categories").delete().eq("id", id);
   if (error) return { error: "Could not delete category." };

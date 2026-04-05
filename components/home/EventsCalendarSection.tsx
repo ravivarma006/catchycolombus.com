@@ -168,10 +168,8 @@ function formatTime(t: string | null): string {
 
 /* ═══════════════════════════ COMPONENT ═══════════════════════════ */
 export default function EventsCalendarSection() {
-  const today = new Date();
-
-  const [viewYear, setViewYear] = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth()); // 0-based
+  const [viewYear, setViewYear] = useState(() => new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(() => new Date().getMonth()); // 0-based
   const [allEvents, setAllEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeDate, setActiveDate] = useState<number | null>(null);
@@ -188,7 +186,7 @@ export default function EventsCalendarSection() {
         .from("events")
         .select("id, slug, title, event_date, event_time, location, description, image_url, category")
         .eq("is_active", true)
-        .gte("event_date", today.toISOString().split("T")[0])
+        .gte("event_date", new Date().toISOString().split("T")[0])
         .order("event_date", { ascending: true })
         .limit(50);
 
@@ -289,9 +287,9 @@ export default function EventsCalendarSection() {
 
       // Seamless loop: reset position without any CSS smooth interference
       if (el.scrollTop >= oneSetHeight * 2) {
-        el.scrollTop -= oneSetHeight;
+        el.scrollTop = Math.round(el.scrollTop - oneSetHeight);
       } else if (el.scrollTop <= 0) {
-        el.scrollTop += oneSetHeight;
+        el.scrollTop = Math.round(el.scrollTop + oneSetHeight);
       }
 
       rAF = requestAnimationFrame(scroll);

@@ -34,7 +34,7 @@ export default async function CouponsPage() {
     .select(
       `id, category_id, product_service_name, phone, email,
        address, description, coupon_code, website, image_url, social_links,
-       expires_at, discount_type, discount_value,
+       expires_at, discount_type, discount_value, is_premium, max_redemptions, current_redemptions,
        coupon_categories ( name, slug )`
     )
     .eq("is_active", true)
