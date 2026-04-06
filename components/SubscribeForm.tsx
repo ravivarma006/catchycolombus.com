@@ -31,6 +31,7 @@ export default function SubscribeForm() {
     startTransition(async () => {
       const result = await subscribe(formData);
       if (result.success) {
+        localStorage.setItem("catchcolumbus_subscribed", "1");
         setMessage({ type: "success", text: "You're subscribed! Welcome to the Columbus community." });
         setEmail("");
       } else {

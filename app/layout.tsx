@@ -110,8 +110,8 @@ export default async function RootLayout({
         <main>{children}</main>
         <Footer />
         <AccentSwitcher />
-        <StickyDealBar />
-        <ExitIntentPopup />
+        {!user && <StickyDealBar />}
+        {!user && <ExitIntentPopup />}
       </body>
     </html>
   );

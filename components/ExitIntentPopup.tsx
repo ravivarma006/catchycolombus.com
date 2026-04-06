@@ -10,19 +10,25 @@ export default function ExitIntentPopup() {
   const triggered = useRef(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("exitPopupSeen")) return;
+    // Already subscribed via ANY form → never show again
+    if (localStorage.getItem("catchcolumbus_subscribed")) return;
+    // Dismissed this session without subscribing → try again next session
+    if (sessionStorage.getItem("popup_dismissed")) return;
 
     // Show popup 3.5 seconds after page load
     const timer = setTimeout(() => {
       triggered.current = true;
       setOpen(true);
-      localStorage.setItem("exitPopupSeen", "1");
     }, 3500);
 
     return () => clearTimeout(timer);
   }, []);
 
-  function close() { setOpen(false); }
+  function dismiss() {
+    setOpen(false);
+    // Only set session flag — popup will return next session
+    sessionStorage.setItem("popup_dismissed", "1");
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,7 +38,11 @@ export default function ExitIntentPopup() {
     fd.append("email", email);
     const result = await subscribe(fd);
     setStatus(result.success ? "success" : "error");
-    if (result.success) setTimeout(close, 2500);
+    if (result.success) {
+      // Permanent flag — never show subscribe prompts again
+      localStorage.setItem("catchcolumbus_subscribed", "1");
+      setTimeout(() => setOpen(false), 2500);
+    }
   }
 
   if (!open) return null;
@@ -43,7 +53,7 @@ export default function ExitIntentPopup() {
       <div
         className="fixed inset-0 z-[60] bg-black/70"
         style={{ backdropFilter: "blur(6px)" }}
-        onClick={close}
+        onClick={dismiss}
       />
 
       {/* Modal */}
@@ -67,7 +77,7 @@ export default function ExitIntentPopup() {
           <div className="relative z-10 p-8 md:p-10">
             {/* Close */}
             <button
-              onClick={close}
+              onClick={dismiss}
               aria-label="Close"
               className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-white/60 hover:bg-white/20 hover:text-white transition-all text-lg leading-none"
             >

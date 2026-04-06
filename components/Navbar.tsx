@@ -47,6 +47,7 @@ export default function Navbar({ user }: NavbarProps) {
     startTransition(async () => {
       const result = await subscribe(formData);
       if (result.success) {
+        localStorage.setItem("catchcolumbus_subscribed", "1");
         setSubMessage({ type: "success", text: "You're subscribed! Check your inbox for a welcome email." });
         setSubEmail("");
       } else {

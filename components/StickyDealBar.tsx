@@ -10,6 +10,11 @@ export default function StickyDealBar() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   useEffect(() => {
+    // Already subscribed via ANY form → never show sticky bar again
+    if (localStorage.getItem("catchcolumbus_subscribed")) {
+      setDismissed(true);
+      return;
+    }
     // Check if dismissed in this session only (sessionStorage resets on tab close)
     if (sessionStorage.getItem("stickyBarDismissed")) {
       setDismissed(true);
@@ -35,7 +40,10 @@ export default function StickyDealBar() {
     fd.append("email", email);
     const result = await subscribe(fd);
     setStatus(result.success ? "success" : "error");
-    if (result.success) setTimeout(dismiss, 2000);
+    if (result.success) {
+      localStorage.setItem("catchcolumbus_subscribed", "1");
+      setTimeout(dismiss, 2000);
+    }
   }
 
   if (dismissed || !visible) return null;
