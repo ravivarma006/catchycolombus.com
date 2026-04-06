@@ -1,12 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Fix: Use memory cache in dev to prevent NTFS file-lock / stale chunk corruption on Windows
-  webpack: (config, { dev }) => {
-    if (dev) {
-      config.cache = { type: "memory" };
-    }
-    return config;
-  },
   images: {
     remotePatterns: [
       {
