@@ -12,29 +12,14 @@ export default function ExitIntentPopup() {
   useEffect(() => {
     if (typeof window !== "undefined" && localStorage.getItem("exitPopupSeen")) return;
 
-    // Desktop: mouse leaves top of viewport
-    function onMouseLeave(e: MouseEvent) {
-      if (e.clientY <= 20 && !triggered.current) {
-        triggered.current = true;
-        setOpen(true);
-        localStorage.setItem("exitPopupSeen", "1");
-      }
-    }
-
-    // Mobile fallback: show after 30s
+    // Show popup 3.5 seconds after page load
     const timer = setTimeout(() => {
-      if (!triggered.current) {
-        triggered.current = true;
-        setOpen(true);
-        localStorage.setItem("exitPopupSeen", "1");
-      }
-    }, 30000);
+      triggered.current = true;
+      setOpen(true);
+      localStorage.setItem("exitPopupSeen", "1");
+    }, 3500);
 
-    document.addEventListener("mouseleave", onMouseLeave);
-    return () => {
-      document.removeEventListener("mouseleave", onMouseLeave);
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(timer);
   }, []);
 
   function close() { setOpen(false); }
