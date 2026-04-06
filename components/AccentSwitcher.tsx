@@ -44,7 +44,7 @@ export default function AccentSwitcher() {
   const current = OPTIONS.find((o) => o.id === active)!;
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-2">
+    <div className="hidden md:flex fixed bottom-6 right-6 z-[9999] flex-col items-end gap-2">
 
       {open && (
         <div
