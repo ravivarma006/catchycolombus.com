@@ -21,6 +21,12 @@ export const metadata: Metadata = {
 
 export default async function CouponsPage() {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  let canSubmit = false;
+  if (user) {
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+    canSubmit = profile?.role === "business_user" || profile?.role === "admin";
+  }
 
   const { data: categories } = await supabase
     .from("coupon_categories")
@@ -78,16 +84,18 @@ export default async function CouponsPage() {
             </p>
           </div>
 
-          {/* Submit CTA */}
-          <Link
-            href="/coupons/submit"
-            className="inline-flex items-center gap-2 bg-accent hover:bg-yellow-400 text-[#020C1B] font-bold text-sm px-6 py-3 rounded-2xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-500/20 shrink-0 mt-2"
-          >
-            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            Submit a Coupon
-          </Link>
+          {/* Submit CTA — only for business_user / admin */}
+          {canSubmit && (
+            <Link
+              href="/coupons/submit"
+              className="inline-flex items-center gap-2 bg-accent hover:bg-yellow-400 text-[#020C1B] font-bold text-sm px-6 py-3 rounded-2xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-500/20 shrink-0 mt-2"
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              Submit a Coupon
+            </Link>
+          )}
         </div>
       </div>
 

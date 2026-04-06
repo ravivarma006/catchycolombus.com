@@ -137,52 +137,54 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Action cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-          <Link
-            href="/dashboard/submissions"
-            className="group bg-white/[0.06] hover:bg-white/[0.10] border border-white/10 hover:border-white/20 rounded-2xl p-6 transition-all"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-primary/30 flex items-center justify-center text-lg">📋</div>
-              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
-                className="text-white/30 group-hover:text-accent transition-colors">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-              </svg>
-            </div>
-            <h2 className="text-white font-black text-lg mb-1 group-hover:text-accent transition-colors"
-              style={{ fontFamily: "'Outfit', sans-serif" }}>
-              My Submissions
-            </h2>
-            <p className="text-white/50 text-sm leading-relaxed">
-              View and manage all your submitted events, businesses, and coupons.
-            </p>
-          </Link>
+        {/* Action cards — only for business_user / admin */}
+        {(role === "business_user" || role === "admin") && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <Link
+              href="/dashboard/submissions"
+              className="group bg-white/[0.06] hover:bg-white/[0.10] border border-white/10 hover:border-white/20 rounded-2xl p-6 transition-all"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/30 flex items-center justify-center text-lg">📋</div>
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
+                  className="text-white/30 group-hover:text-accent transition-colors">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+              <h2 className="text-white font-black text-lg mb-1 group-hover:text-accent transition-colors"
+                style={{ fontFamily: "'Outfit', sans-serif" }}>
+                My Submissions
+              </h2>
+              <p className="text-white/50 text-sm leading-relaxed">
+                View and manage all your submitted events, businesses, and coupons.
+              </p>
+            </Link>
 
-          <div className="bg-white/[0.06] border border-white/10 rounded-2xl p-6">
-            <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center text-lg mb-4">➕</div>
-            <h2 className="text-white font-black text-lg mb-3" style={{ fontFamily: "'Outfit', sans-serif" }}>
-              Submit New
-            </h2>
-            <div className="flex flex-col gap-2">
-              <Link href="/events/submit"
-                className="text-sm text-white/70 hover:text-accent transition-colors flex items-center gap-2 font-medium">
-                <span className="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-xs">📅</span>
-                Submit an Event
-              </Link>
-              <Link href="/services/submit"
-                className="text-sm text-white/70 hover:text-accent transition-colors flex items-center gap-2 font-medium">
-                <span className="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-xs">🏢</span>
-                List Your Business
-              </Link>
-              <Link href="/coupons/submit"
-                className="text-sm text-white/70 hover:text-accent transition-colors flex items-center gap-2 font-medium">
-                <span className="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-xs">🏷️</span>
-                Submit a Coupon
-              </Link>
+            <div className="bg-white/[0.06] border border-white/10 rounded-2xl p-6">
+              <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center text-lg mb-4">➕</div>
+              <h2 className="text-white font-black text-lg mb-3" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                Submit New
+              </h2>
+              <div className="flex flex-col gap-2">
+                <Link href="/events/submit"
+                  className="text-sm text-white/70 hover:text-accent transition-colors flex items-center gap-2 font-medium">
+                  <span className="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-xs">📅</span>
+                  Submit an Event
+                </Link>
+                <Link href="/services/submit"
+                  className="text-sm text-white/70 hover:text-accent transition-colors flex items-center gap-2 font-medium">
+                  <span className="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-xs">🏢</span>
+                  List Your Business
+                </Link>
+                <Link href="/coupons/submit"
+                  className="text-sm text-white/70 hover:text-accent transition-colors flex items-center gap-2 font-medium">
+                  <span className="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-xs">🏷️</span>
+                  Submit a Coupon
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Admin shortcut */}
         {role === "admin" && (

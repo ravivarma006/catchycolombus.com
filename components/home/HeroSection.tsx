@@ -65,6 +65,7 @@ export default function HeroSection({ slides, stats }: HeroSectionProps) {
 
   /* advance to next slide */
   const goNext = useCallback(() => {
+    if (slides.length === 0) return;
     setActive((p) => (p + 1) % slides.length);
     setPhase("show");
   }, [slides.length]);
@@ -77,7 +78,7 @@ export default function HeroSection({ slides, stats }: HeroSectionProps) {
 
   /* ── Two-phase auto-rotate ── */
   useEffect(() => {
-    if (paused) return;
+    if (paused || slides.length === 0) return;
 
     if (phase === "show") {
       const t = setTimeout(() => setPhase("exiting"), SHOW_DURATION);

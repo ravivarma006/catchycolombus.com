@@ -44,7 +44,7 @@ export default async function AdminCouponsPage() {
   }>;
 
   return (
-    <div className="px-8 py-10 max-w-4xl">
+    <div className="px-4 py-6 md:px-8 md:py-10 max-w-4xl">
       <div className="mb-8">
         <h1 className="text-3xl font-black text-white mb-1" style={{ fontFamily: "'Outfit', sans-serif" }}>
           Coupons Management

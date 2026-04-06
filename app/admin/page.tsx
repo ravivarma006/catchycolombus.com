@@ -105,11 +105,11 @@ export default async function AdminOverviewPage() {
   ];
 
   return (
-    <div className="px-8 py-10 max-w-4xl">
+    <div className="px-4 py-6 md:px-8 md:py-10 max-w-4xl">
       {/* Header */}
-      <div className="mb-10">
+      <div className="mb-8 md:mb-10">
         <h1
-          className="text-4xl font-black text-white mb-2"
+          className="text-3xl md:text-4xl font-black text-white mb-2"
           style={{ fontFamily: "'Outfit', sans-serif" }}
         >
           Admin Overview
@@ -120,22 +120,22 @@ export default async function AdminOverviewPage() {
       </div>
 
       {/* Top stats */}
-      <div className="grid grid-cols-3 gap-4 mb-10">
-        <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-5 text-center">
-          <p className={`text-4xl font-black mb-1 ${counts.pending > 0 ? "text-amber-400" : "text-white"}`}>
+      <div className="grid grid-cols-3 gap-3 md:gap-4 mb-8 md:mb-10">
+        <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-3 md:p-5 text-center">
+          <p className={`text-2xl md:text-4xl font-black mb-1 ${counts.pending > 0 ? "text-amber-400" : "text-white"}`}>
             {counts.pending}
           </p>
-          <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Pending</p>
+          <p className="text-white/40 text-[10px] md:text-xs font-bold uppercase tracking-widest">Pending</p>
         </div>
-        <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-5 text-center">
-          <p className={`text-4xl font-black mb-1 ${counts.needsChanges > 0 ? "text-orange-400" : "text-white"}`}>
+        <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-3 md:p-5 text-center">
+          <p className={`text-2xl md:text-4xl font-black mb-1 ${counts.needsChanges > 0 ? "text-orange-400" : "text-white"}`}>
             {counts.needsChanges}
           </p>
-          <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Needs Changes</p>
+          <p className="text-white/40 text-[10px] md:text-xs font-bold uppercase tracking-widest leading-tight">Needs<br className="md:hidden" /> Changes</p>
         </div>
-        <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-5 text-center">
-          <p className="text-4xl font-black text-green-400 mb-1">{counts.approved}</p>
-          <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Approved</p>
+        <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-3 md:p-5 text-center">
+          <p className="text-2xl md:text-4xl font-black text-green-400 mb-1">{counts.approved}</p>
+          <p className="text-white/40 text-[10px] md:text-xs font-bold uppercase tracking-widest">Approved</p>
         </div>
       </div>
 

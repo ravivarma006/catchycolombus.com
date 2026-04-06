@@ -54,6 +54,12 @@ export default async function CategoryPage({
   params: { slug: string };
 }) {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  let canSubmit = false;
+  if (user) {
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+    canSubmit = profile?.role === "business_user" || profile?.role === "admin";
+  }
 
   // Get category
   const { data: category } = await supabase
@@ -161,15 +167,17 @@ export default async function CategoryPage({
             {providerList.length}{" "}
             {providerList.length === 1 ? "Listing" : "Listings"}
           </p>
-          <Link
-            href="/services/submit"
-            className="inline-flex items-center gap-2 bg-accent hover:bg-yellow-400 text-[#020C1B] font-bold text-sm px-5 py-2.5 rounded-2xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-500/20"
-          >
-            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            List Your Business
-          </Link>
+          {canSubmit && (
+            <Link
+              href="/services/submit"
+              className="inline-flex items-center gap-2 bg-accent hover:bg-yellow-400 text-[#020C1B] font-bold text-sm px-5 py-2.5 rounded-2xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-500/20"
+            >
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              List Your Business
+            </Link>
+          )}
         </div>
 
         {providerList.length === 0 ? (
@@ -178,15 +186,21 @@ export default async function CategoryPage({
             <p className="text-white/50 font-semibold text-lg">
               No providers listed yet.
             </p>
-            <p className="text-white/30 text-sm">
-              Are you a business in this category?{" "}
-              <Link
-                href="/services/submit"
-                className="text-accent hover:underline"
-              >
-                Submit your listing
-              </Link>
-            </p>
+            {canSubmit ? (
+              <p className="text-white/30 text-sm">
+                Are you a business in this category?{" "}
+                <Link
+                  href="/services/submit"
+                  className="text-accent hover:underline"
+                >
+                  Submit your listing
+                </Link>
+              </p>
+            ) : (
+              <p className="text-white/30 text-sm">
+                Check back soon — listings are being added.
+              </p>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
