@@ -108,7 +108,7 @@ export default function EventsContent({ events }: { events: Event[] }) {
                 className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
                   isActive
                     ? "bg-accent text-[#020C1B] shadow-lg shadow-amber-500/20"
-                    : "bg-white/8 border border-white/10 text-white/70 hover:bg-white/[0.12] hover:text-white"
+                    : "bg-white/60 backdrop-blur-sm border border-white/80 text-gray-600 shadow-sm shadow-gray-200/40 hover:bg-white/80 hover:text-gray-900 hover:shadow-md"
                 }`}
               >
                 {label}
@@ -126,7 +126,7 @@ export default function EventsContent({ events }: { events: Event[] }) {
               className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
                 activeDateFilter === d
                   ? "bg-primary text-white shadow-lg"
-                  : "bg-white/8 border border-white/10 text-white/70 hover:bg-white/[0.12] hover:text-white"
+                  : "bg-white/60 backdrop-blur-sm border border-white/80 text-gray-600 shadow-sm shadow-gray-200/40 hover:bg-white/80 hover:text-gray-900 hover:shadow-md"
               }`}
             >
               {DATE_LABELS[d]}
@@ -139,8 +139,8 @@ export default function EventsContent({ events }: { events: Event[] }) {
       {filtered.length === 0 && (
         <div className="flex flex-col items-center justify-center py-40 gap-4 text-center">
           <div className="text-6xl opacity-30">📅</div>
-          <p className="text-white/50 font-semibold text-xl">No events found.</p>
-          <p className="text-white/30 text-sm">Try a different filter or check back soon.</p>
+          <p className="text-gray-500 font-semibold text-xl">No events found.</p>
+          <p className="text-gray-400 text-sm">Try a different filter or check back soon.</p>
         </div>
       )}
 
@@ -154,10 +154,10 @@ export default function EventsContent({ events }: { events: Event[] }) {
             {featured.map((event, idx) => {
               const img = event.image_url || EVENT_FALLBACK_IMAGES[idx % EVENT_FALLBACK_IMAGES.length];
               const tag = (event.category || "EVENT").toUpperCase();
-              const tagClass = TAG_COLOURS[tag] ?? "bg-white/10 text-white/80";
+              const tagClass = TAG_COLOURS[tag] ?? "bg-gray-100 text-gray-700";
               return (
                 <Link key={event.id} href={`/events/${event.slug}`} className="group block">
-                  <div className="relative w-full h-72 rounded-3xl overflow-hidden">
+                  <div className="relative w-full h-72 rounded-3xl overflow-hidden shadow-lg shadow-gray-200/60 hover:shadow-2xl hover:shadow-gray-300/60 transition-all duration-500">
                     <Image
                       src={img}
                       alt={event.title}
@@ -202,18 +202,18 @@ export default function EventsContent({ events }: { events: Event[] }) {
         <section>
           {featured.length > 0 && (
             <div className="flex items-center gap-3 mb-6">
-              <span className="text-white/50 font-bold text-sm tracking-widest uppercase">All Events</span>
+              <span className="text-gray-400 font-bold text-sm tracking-widest uppercase">All Events</span>
             </div>
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {rest.map((event, idx) => {
               const img = event.image_url || EVENT_FALLBACK_IMAGES[idx % EVENT_FALLBACK_IMAGES.length];
               const tag = (event.category || "EVENT").toUpperCase();
-              const tagClass = TAG_COLOURS[tag] ?? "bg-white/10 text-white/80";
+              const tagClass = TAG_COLOURS[tag] ?? "bg-gray-100 text-gray-700";
               const isFree = event.price?.toLowerCase() === "free";
               return (
                 <Link key={event.id} href={`/events/${event.slug}`} className="group block">
-                  <div className="bg-white/8 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden hover:border-white/20 hover:bg-white/12 hover:shadow-2xl hover:shadow-black/30 transition-all duration-400">
+                  <div className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-3xl overflow-hidden shadow-lg shadow-gray-200/50 hover:bg-white/90 hover:shadow-2xl hover:shadow-gray-300/60 hover:border-white transition-all duration-400">
                     <div className="relative w-full h-48 overflow-hidden">
                       <Image
                         src={img}
@@ -237,15 +237,15 @@ export default function EventsContent({ events }: { events: Event[] }) {
                       )}
                     </div>
                     <div className="p-5">
-                      <h3 className="text-lg font-black text-white mb-2 leading-snug line-clamp-2 group-hover:text-accent transition-colors duration-300" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                      <h3 className="text-lg font-black text-gray-900 mb-2 leading-snug line-clamp-2 group-hover:text-accent transition-colors duration-300" style={{ fontFamily: "'Outfit', sans-serif" }}>
                         {event.title}
                       </h3>
                       {event.description && (
-                        <p className="text-white/50 text-sm line-clamp-2 mb-4 leading-relaxed">
+                        <p className="text-gray-500 text-sm line-clamp-2 mb-4 leading-relaxed">
                           {event.description}
                         </p>
                       )}
-                      <div className="flex flex-col gap-1.5 text-xs text-white/50 font-medium">
+                      <div className="flex flex-col gap-1.5 text-xs text-gray-400 font-medium">
                         <div className="flex items-center gap-2">
                           <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                             <rect x="3" y="4" width="18" height="18" rx="2" />

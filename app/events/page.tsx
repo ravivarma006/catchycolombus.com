@@ -32,14 +32,14 @@ export default async function EventsPage() {
 
   return (
     <div
-      className="min-h-screen"
-      style={{ background: "linear-gradient(135deg, #020C1B 0%, #0D1B3E 50%, #0A0E27 100%)" }}
+      className="min-h-screen relative"
+      style={{ background: "linear-gradient(160deg, #ffffff 0%, #f0f4f8 40%, #e8edf4 70%, #f5f3f0 100%)" }}
     >
-      {/* Ambient blobs */}
+      {/* Soft ambient glows */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-15%] left-[-10%] w-[55%] h-[55%] rounded-full bg-blue-500/20 blur-[130px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-amber-400/15 blur-[130px]" />
-        <div className="absolute top-[40%] left-[35%] w-[40%] h-[40%] rounded-full bg-violet-600/15 blur-[110px]" />
+        <div className="absolute top-[-10%] left-[-5%] w-[45%] h-[45%] rounded-full bg-primary/5 blur-[120px]" />
+        <div className="absolute bottom-[-5%] right-[-5%] w-[40%] h-[40%] rounded-full bg-accent/8 blur-[120px]" />
+        <div className="absolute top-[50%] left-[40%] w-[30%] h-[30%] rounded-full bg-blue-200/20 blur-[100px]" />
       </div>
 
       {/* Page Header */}
@@ -51,12 +51,12 @@ export default async function EventsPage() {
               <span className="text-xs font-bold tracking-[0.2em] uppercase text-accent">Columbus, Ohio</span>
             </div>
             <h1
-              className="text-5xl md:text-6xl font-black text-white tracking-tight leading-tight"
+              className="text-5xl md:text-6xl font-black text-gray-900 tracking-tight leading-tight"
               style={{ fontFamily: "'Outfit', sans-serif" }}
             >
               Upcoming <span style={{ color: "var(--accent)" }}>Events</span>
             </h1>
-            <p className="text-white/60 mt-3 text-lg font-medium max-w-xl">
+            <p className="text-gray-500 mt-3 text-lg font-medium max-w-xl">
               Discover what&apos;s happening around Columbus in the next 3 months.
             </p>
           </div>
