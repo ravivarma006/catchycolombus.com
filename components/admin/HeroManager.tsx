@@ -14,6 +14,7 @@ import {
 } from "@/app/admin/hero/actions";
 import ImageUpload from "@/components/admin/ImageUpload";
 import Image from "next/image";
+import AdminSlidePanel from "@/components/admin/AdminSlidePanel";
 
 interface HeroSlide {
   id: string;
@@ -179,9 +180,9 @@ export default function HeroManager({
     return (
       <form
         action={isEdit ? handleUpdateSlide : handleCreateSlide}
-        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-8 space-y-4"
+        className="space-y-4"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div>
             <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Main Image *</label>
             <ImageUpload bucket="city-images" folder="hero" onUpload={setImgUrl} currentUrl={imgUrl} />
@@ -194,7 +195,7 @@ export default function HeroManager({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div>
             <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Location *</label>
             <input name="location" required defaultValue={slide?.location || ""} className={INPUT_CLS} placeholder="e.g. Downtown Columbus" />
@@ -234,7 +235,7 @@ export default function HeroManager({
           <textarea name="subtitle" required rows={2} defaultValue={slide?.subtitle || ""} className={`${INPUT_CLS} resize-none`} placeholder="Subtitle text..." />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div>
             <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Overlay From</label>
             <div className="flex items-center gap-2">
@@ -271,9 +272,9 @@ export default function HeroManager({
     return (
       <form
         action={isEdit ? handleUpdateStat : handleCreateStat}
-        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-6 space-y-4"
+        className="space-y-4"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div>
             <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Value *</label>
             <input name="value" required defaultValue={stat?.value || ""} className={INPUT_CLS} placeholder="e.g. 900K+" />
@@ -316,17 +317,19 @@ export default function HeroManager({
       {/* ═══════════ SLIDES TAB ═══════════ */}
       {tab === "slides" && (
         <div>
-          {!editingSlide && (
-            <button
-              onClick={() => { setShowSlideForm(!showSlideForm); setError(null); setHeadlineLines([""]); }}
-              className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
-            >
-              {showSlideForm ? "Cancel" : "+ New Slide"}
-            </button>
-          )}
+          <button
+            onClick={() => { setShowSlideForm(true); setError(null); setHeadlineLines([""]); }}
+            className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
+          >
+            + New Slide
+          </button>
 
-          {showSlideForm && !editingSlide && renderSlideForm("create")}
-          {editingSlide && renderSlideForm("edit", editingSlide)}
+          <AdminSlidePanel isOpen={showSlideForm && !editingSlide} onClose={() => setShowSlideForm(false)} title="New Slide">
+            {renderSlideForm("create")}
+          </AdminSlidePanel>
+          <AdminSlidePanel isOpen={!!editingSlide} onClose={() => { setEditingSlide(null); setEditImageUrl(""); setEditThumbUrl(""); setEditHeadlineLines([""]); }} title="Edit Slide">
+            {editingSlide && renderSlideForm("edit", editingSlide)}
+          </AdminSlidePanel>
 
           {slides.length === 0 ? (
             <p className="text-white/30 text-sm">No hero slides yet.</p>
@@ -337,7 +340,7 @@ export default function HeroManager({
                   key={slide.id}
                   className={`bg-white/[0.05] border rounded-2xl p-5 transition ${
                     slide.is_active ? "border-white/10" : "border-white/5 opacity-50"
-                  } ${editingSlide?.id === slide.id ? "ring-2 ring-accent" : ""}`}
+                  }`}
                 >
                   <div className="flex items-start gap-4">
                     {/* Thumbnail preview */}
@@ -388,17 +391,19 @@ export default function HeroManager({
       {/* ═══════════ STATS TAB ═══════════ */}
       {tab === "stats" && (
         <div>
-          {!editingStat && (
-            <button
-              onClick={() => { setShowStatForm(!showStatForm); setError(null); }}
-              className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
-            >
-              {showStatForm ? "Cancel" : "+ New Stat"}
-            </button>
-          )}
+          <button
+            onClick={() => { setShowStatForm(true); setError(null); }}
+            className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
+          >
+            + New Stat
+          </button>
 
-          {showStatForm && !editingStat && renderStatForm("create")}
-          {editingStat && renderStatForm("edit", editingStat)}
+          <AdminSlidePanel isOpen={showStatForm && !editingStat} onClose={() => setShowStatForm(false)} title="New Stat">
+            {renderStatForm("create")}
+          </AdminSlidePanel>
+          <AdminSlidePanel isOpen={!!editingStat} onClose={() => setEditingStat(null)} title="Edit Stat">
+            {editingStat && renderStatForm("edit", editingStat)}
+          </AdminSlidePanel>
 
           {stats.length === 0 ? (
             <p className="text-white/30 text-sm">No stats yet.</p>
@@ -409,7 +414,7 @@ export default function HeroManager({
                   key={stat.id}
                   className={`bg-white/[0.05] border rounded-2xl p-4 flex items-center justify-between transition ${
                     stat.is_active ? "border-white/10" : "border-white/5 opacity-50"
-                  } ${editingStat?.id === stat.id ? "ring-2 ring-accent" : ""}`}
+                  }`}
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-accent font-extrabold text-xl" style={{ fontFamily: "'Outfit', sans-serif" }}>

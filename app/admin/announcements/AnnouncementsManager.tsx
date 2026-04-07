@@ -9,6 +9,7 @@ import {
   deleteAnnouncement,
 } from "./actions";
 import ImageUpload from "@/components/admin/ImageUpload";
+import AdminSlidePanel from "@/components/admin/AdminSlidePanel";
 
 interface Announcement {
   id: string;
@@ -81,7 +82,7 @@ export default function AnnouncementsManager({
     return (
       <form
         action={isEdit ? handleUpdate : handleCreate}
-        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-8 space-y-4"
+        className="space-y-4"
       >
         <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Title *</label>
@@ -115,17 +116,19 @@ export default function AnnouncementsManager({
 
   return (
     <div>
-      {!editing && (
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
-        >
-          {showForm ? "Cancel" : "+ New Announcement"}
-        </button>
-      )}
+      <button
+        onClick={() => { setShowForm(true); setError(null); }}
+        className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
+      >
+        + New Announcement
+      </button>
 
-      {showForm && !editing && renderForm("create")}
-      {editing && renderForm("edit", editing)}
+      <AdminSlidePanel isOpen={showForm && !editing} onClose={() => setShowForm(false)} title="New Announcement">
+        {renderForm("create")}
+      </AdminSlidePanel>
+      <AdminSlidePanel isOpen={!!editing} onClose={() => { setEditing(null); setEditImageUrl(""); }} title="Edit Announcement">
+        {editing && renderForm("edit", editing)}
+      </AdminSlidePanel>
 
       {/* List */}
       {announcements.length === 0 ? (
@@ -137,7 +140,7 @@ export default function AnnouncementsManager({
               key={item.id}
               className={`bg-white/[0.05] border rounded-2xl p-5 transition ${
                 item.is_active ? "border-white/10" : "border-white/5 opacity-50"
-              } ${editing?.id === item.id ? "ring-2 ring-accent" : ""}`}
+              }`}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">

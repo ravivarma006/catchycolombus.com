@@ -11,6 +11,7 @@ import {
   deleteCoupon,
 } from "@/app/admin/actions";
 import ImageUpload from "@/components/admin/ImageUpload";
+import AdminSlidePanel from "@/components/admin/AdminSlidePanel";
 
 interface CouponCategory {
   id: string;
@@ -133,9 +134,9 @@ export default function CouponsManager({
     return (
       <form
         action={isEdit ? handleUpdateCategory : handleCreateCategory}
-        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+        className="grid grid-cols-1 gap-4"
       >
-        <div className="md:col-span-2">
+        <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Name *</label>
           <input name="name" required defaultValue={cat?.name || ""} className={INPUT_CLS} placeholder="e.g. Food" />
         </div>
@@ -147,11 +148,11 @@ export default function CouponsManager({
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Display Order</label>
           <input name="display_order" type="number" defaultValue={cat?.display_order ?? 0} className={INPUT_CLS} />
         </div>
-        <div className="md:col-span-2">
+        <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Description</label>
           <input name="description" defaultValue={cat?.description || ""} className={INPUT_CLS} placeholder="Short description" />
         </div>
-        <div className="md:col-span-2 flex gap-3">
+        <div className="flex gap-3">
           <button type="submit" disabled={isPending} className="px-6 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition disabled:opacity-50">
             {isPending ? (isEdit ? "Saving..." : "Creating...") : (isEdit ? "Save Changes" : "Create Category")}
           </button>
@@ -168,9 +169,9 @@ export default function CouponsManager({
     return (
       <form
         action={handleUpdateCoupon}
-        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+        className="grid grid-cols-1 gap-4"
       >
-        <div className="md:col-span-2">
+        <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Product / Service Name *</label>
           <input name="product_service_name" required defaultValue={coupon.product_service_name} className={INPUT_CLS} placeholder="Product or service name" />
         </div>
@@ -195,11 +196,11 @@ export default function CouponsManager({
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Email</label>
           <input name="email" type="email" defaultValue={coupon.email || ""} className={INPUT_CLS} placeholder="info@example.com" />
         </div>
-        <div className="md:col-span-2">
+        <div className="">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Address</label>
           <input name="address" defaultValue={coupon.address || ""} className={INPUT_CLS} placeholder="Full address" />
         </div>
-        <div className="md:col-span-2">
+        <div className="">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Description</label>
           <textarea name="description" rows={3} defaultValue={coupon.description || ""} className={`${INPUT_CLS} resize-none`} placeholder="Describe the coupon offer..." />
         </div>
@@ -227,7 +228,7 @@ export default function CouponsManager({
           <ImageUpload bucket="coupon-images" folder="coupons" onUpload={setEditCouponImageUrl} currentUrl={editCouponImageUrl} />
           <input type="hidden" name="image_url" value={editCouponImageUrl} />
         </div>
-        <div className="md:col-span-2 flex gap-3">
+        <div className=" flex gap-3">
           <button type="submit" disabled={isPending} className="px-6 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition disabled:opacity-50">
             {isPending ? "Saving..." : "Save Changes"}
           </button>
@@ -265,17 +266,19 @@ export default function CouponsManager({
       {/* ════════════════════════════════════════ */}
       {tab === "categories" && (
         <div>
-          {!editingCat && (
-            <button
-              onClick={() => setShowCatForm(!showCatForm)}
-              className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
-            >
-              {showCatForm ? "Cancel" : "+ New Category"}
-            </button>
-          )}
+          <button
+            onClick={() => { setShowCatForm(true); setError(null); }}
+            className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
+          >
+            + New Category
+          </button>
 
-          {showCatForm && !editingCat && renderCategoryForm("create")}
-          {editingCat && renderCategoryForm("edit", editingCat)}
+          <AdminSlidePanel isOpen={showCatForm && !editingCat} onClose={() => setShowCatForm(false)} title="New Coupon Category">
+            {renderCategoryForm("create")}
+          </AdminSlidePanel>
+          <AdminSlidePanel isOpen={!!editingCat} onClose={() => setEditingCat(null)} title="Edit Coupon Category">
+            {editingCat && renderCategoryForm("edit", editingCat)}
+          </AdminSlidePanel>
 
           {/* Category list */}
           {categories.length === 0 ? (
@@ -287,7 +290,7 @@ export default function CouponsManager({
                   key={cat.id}
                   className={`bg-white/[0.05] border rounded-2xl p-5 flex items-center justify-between gap-4 transition ${
                     cat.is_active ? "border-white/10" : "border-white/5 opacity-50"
-                  } ${editingCat?.id === cat.id ? "ring-2 ring-accent" : ""}`}
+                  }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {cat.icon && <span className="text-2xl">{cat.icon}</span>}
@@ -335,7 +338,9 @@ export default function CouponsManager({
             </select>
           </div>
 
-          {editingCoupon && renderCouponForm(editingCoupon)}
+          <AdminSlidePanel isOpen={!!editingCoupon} onClose={() => { setEditingCoupon(null); setEditCouponImageUrl(""); }} title="Edit Coupon">
+            {editingCoupon && renderCouponForm(editingCoupon)}
+          </AdminSlidePanel>
 
           {/* Coupon list */}
           {filteredCoupons.length === 0 ? (
@@ -347,7 +352,7 @@ export default function CouponsManager({
                   key={coupon.id}
                   className={`bg-white/[0.05] border rounded-2xl p-5 transition ${
                     coupon.is_active ? "border-white/10" : "border-white/5 opacity-50"
-                  } ${editingCoupon?.id === coupon.id ? "ring-2 ring-accent" : ""}`}
+                  }`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">

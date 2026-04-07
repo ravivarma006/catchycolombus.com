@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { updateEvent, toggleEventActive, deleteEvent, createEvent } from "@/app/admin/actions";
 import ImageUpload from "@/components/admin/ImageUpload";
+import AdminSlidePanel from "@/components/admin/AdminSlidePanel";
 
 interface ApprovedEvent {
   id: string;
@@ -83,9 +84,9 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
     return (
       <form
         action={handleUpdate}
-        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+        className="grid grid-cols-1 gap-4"
       >
-        <div className="md:col-span-2">
+        <div className="col-span-1">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Title *
           </label>
@@ -123,7 +124,7 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
           />
         </div>
 
-        <div className="md:col-span-2">
+        <div className="col-span-1">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Location
           </label>
@@ -135,7 +136,7 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
           />
         </div>
 
-        <div className="md:col-span-2">
+        <div className="col-span-1">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Description
           </label>
@@ -198,7 +199,7 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
           <input type="hidden" name="image_url" value={editImageUrl} />
         </div>
 
-        <div className="flex items-center gap-2 md:col-span-2">
+        <div className="flex items-center gap-2 col-span-1">
           <input
             type="checkbox"
             name="is_featured"
@@ -212,7 +213,7 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
           </label>
         </div>
 
-        <div className="md:col-span-2 flex gap-3">
+        <div className="col-span-1 flex gap-3">
           <button
             type="submit"
             disabled={isPending}
@@ -239,9 +240,9 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
     return (
       <form
         action={handleCreate}
-        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+        className="grid grid-cols-1 gap-4"
       >
-        <div className="md:col-span-2">
+        <div className="col-span-1">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Title *
           </label>
@@ -262,14 +263,14 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
           <input name="event_time" className={INPUT_CLS} placeholder="e.g. 7:00 PM - 10:00 PM" />
         </div>
 
-        <div className="md:col-span-2">
+        <div className="col-span-1">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Location
           </label>
           <input name="location" className={INPUT_CLS} placeholder="Venue name and address" />
         </div>
 
-        <div className="md:col-span-2">
+        <div className="col-span-1">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Description
           </label>
@@ -310,14 +311,14 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
           <input type="hidden" name="image_url" value={createImageUrl} />
         </div>
 
-        <div className="flex items-center gap-2 md:col-span-2">
+        <div className="flex items-center gap-2 col-span-1">
           <input type="checkbox" name="is_featured" value="true" id="create_is_featured" className="rounded border-white/20" />
           <label htmlFor="create_is_featured" className="text-white/60 text-sm">
             Featured event
           </label>
         </div>
 
-        <div className="md:col-span-2 flex gap-3">
+        <div className="col-span-1 flex gap-3">
           <button type="submit" disabled={isPending} className="px-6 py-2.5 bg-green-500 text-white font-bold rounded-xl text-sm hover:bg-green-400 transition disabled:opacity-50">
             {isPending ? "Creating..." : "Create Event"}
           </button>
@@ -335,18 +336,20 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
     <div>
       <div className="flex justify-between items-center mb-4">
         {error && <p className="text-red-400 text-sm">{error}</p>}
-        {!isCreating && !editingEvent && (
-          <button
-            onClick={() => setIsCreating(true)}
-            className="px-4 py-2 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition ml-auto"
-          >
-            + Add New Event
-          </button>
-        )}
+        <button
+          onClick={() => setIsCreating(true)}
+          className="px-4 py-2 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition ml-auto"
+        >
+          + Add New Event
+        </button>
       </div>
 
-      {isCreating && renderCreateForm()}
-      {editingEvent && renderEditForm(editingEvent)}
+      <AdminSlidePanel isOpen={isCreating} onClose={() => { setIsCreating(false); setCreateImageUrl(""); }} title="New Event">
+        {renderCreateForm()}
+      </AdminSlidePanel>
+      <AdminSlidePanel isOpen={!!editingEvent} onClose={() => { setEditingEvent(null); setEditImageUrl(""); }} title="Edit Event">
+        {editingEvent && renderEditForm(editingEvent)}
+      </AdminSlidePanel>
 
       {events.length === 0 ? (
         <p className="text-white/30 text-sm">No approved events yet.</p>
@@ -357,7 +360,7 @@ export default function EventsManager({ events }: { events: ApprovedEvent[] }) {
               key={evt.id}
               className={`bg-white/[0.05] border rounded-2xl p-5 transition ${
                 evt.is_active ? "border-white/10" : "border-white/5 opacity-50"
-              } ${editingEvent?.id === evt.id ? "ring-2 ring-accent" : ""}`}
+              }`}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">

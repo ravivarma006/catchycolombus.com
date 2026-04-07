@@ -11,6 +11,7 @@ import {
   deleteProvider,
 } from "@/app/admin/actions";
 import ImageUpload from "@/components/admin/ImageUpload";
+import AdminSlidePanel from "@/components/admin/AdminSlidePanel";
 
 interface ServiceCategory {
   id: string;
@@ -156,9 +157,9 @@ export default function ProvidersManager({
     return (
       <form
         action={isEdit ? handleUpdateCategory : handleCreateCategory}
-        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+        className="grid grid-cols-1 gap-4"
       >
-        <div className="md:col-span-2">
+        <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Name *
           </label>
@@ -192,7 +193,7 @@ export default function ProvidersManager({
             className={INPUT_CLS}
           />
         </div>
-        <div className="md:col-span-2">
+        <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Description
           </label>
@@ -203,7 +204,7 @@ export default function ProvidersManager({
             placeholder="Short description"
           />
         </div>
-        <div className="md:col-span-2">
+        <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Image
           </label>
@@ -215,7 +216,7 @@ export default function ProvidersManager({
           />
           <input type="hidden" name="image_url" value={imgUrl} />
         </div>
-        <div className="md:col-span-2 flex gap-3">
+        <div className="flex gap-3">
           <button
             type="submit"
             disabled={isPending}
@@ -246,9 +247,9 @@ export default function ProvidersManager({
     return (
       <form
         action={handleUpdateProvider}
-        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+        className="grid grid-cols-1 gap-4"
       >
-        <div className="md:col-span-2">
+        <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Name *
           </label>
@@ -314,7 +315,7 @@ export default function ProvidersManager({
             placeholder="https://..."
           />
         </div>
-        <div className="md:col-span-2">
+        <div className="">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Address
           </label>
@@ -325,7 +326,7 @@ export default function ProvidersManager({
             placeholder="Full address"
           />
         </div>
-        <div className="md:col-span-2">
+        <div className="">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Description
           </label>
@@ -337,7 +338,7 @@ export default function ProvidersManager({
             placeholder="About this provider..."
           />
         </div>
-        <div className="md:col-span-2">
+        <div className="">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">
             Image
           </label>
@@ -385,7 +386,7 @@ export default function ProvidersManager({
             placeholder="https://twitter.com/..."
           />
         </div>
-        <div className="md:col-span-2 flex gap-3">
+        <div className=" flex gap-3">
           <button
             type="submit"
             disabled={isPending}
@@ -441,17 +442,19 @@ export default function ProvidersManager({
       {/* ════════════════════════════════════════ */}
       {tab === "categories" && (
         <div>
-          {!editingCat && (
-            <button
-              onClick={() => setShowCatForm(!showCatForm)}
-              className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
-            >
-              {showCatForm ? "Cancel" : "+ New Category"}
-            </button>
-          )}
+          <button
+            onClick={() => { setShowCatForm(true); setError(null); }}
+            className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
+          >
+            + New Category
+          </button>
 
-          {showCatForm && !editingCat && renderCategoryForm("create")}
-          {editingCat && renderCategoryForm("edit", editingCat)}
+          <AdminSlidePanel isOpen={showCatForm && !editingCat} onClose={() => setShowCatForm(false)} title="New Service Category">
+            {renderCategoryForm("create")}
+          </AdminSlidePanel>
+          <AdminSlidePanel isOpen={!!editingCat} onClose={() => { setEditingCat(null); setEditCatImageUrl(""); }} title="Edit Service Category">
+            {editingCat && renderCategoryForm("edit", editingCat)}
+          </AdminSlidePanel>
 
           {/* Category list */}
           {categories.length === 0 ? (
@@ -463,7 +466,7 @@ export default function ProvidersManager({
                   key={cat.id}
                   className={`bg-white/[0.05] border rounded-2xl p-5 flex items-center justify-between gap-4 transition ${
                     cat.is_active ? "border-white/10" : "border-white/5 opacity-50"
-                  } ${editingCat?.id === cat.id ? "ring-2 ring-accent" : ""}`}
+                  }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {cat.icon && <span className="text-2xl">{cat.icon}</span>}
@@ -527,7 +530,9 @@ export default function ProvidersManager({
             </select>
           </div>
 
-          {editingProv && renderProviderForm(editingProv)}
+          <AdminSlidePanel isOpen={!!editingProv} onClose={() => { setEditingProv(null); setEditProvImageUrl(""); }} title="Edit Provider">
+            {editingProv && renderProviderForm(editingProv)}
+          </AdminSlidePanel>
 
           {/* Provider list */}
           {filteredProviders.length === 0 ? (
@@ -539,7 +544,7 @@ export default function ProvidersManager({
                   key={prov.id}
                   className={`bg-white/[0.05] border rounded-2xl p-5 transition ${
                     prov.is_active ? "border-white/10" : "border-white/5 opacity-50"
-                  } ${editingProv?.id === prov.id ? "ring-2 ring-accent" : ""}`}
+                  }`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">

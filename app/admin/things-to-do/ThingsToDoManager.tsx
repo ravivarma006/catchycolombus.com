@@ -13,6 +13,7 @@ import {
   deleteActivity,
 } from "./actions";
 import ImageUpload from "@/components/admin/ImageUpload";
+import AdminSlidePanel from "@/components/admin/AdminSlidePanel";
 
 interface Category {
   id: string;
@@ -160,9 +161,9 @@ export default function ThingsToDoManager({
     return (
       <form
         action={isEdit ? handleUpdateCategory : handleCreateCategory}
-        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+        className="grid grid-cols-1 gap-4"
       >
-        <div className="md:col-span-2">
+        <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Name *</label>
           <input name="name" required defaultValue={cat?.name || ""} className={INPUT_CLS} placeholder="e.g. Museums" />
         </div>
@@ -174,16 +175,16 @@ export default function ThingsToDoManager({
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Display Order</label>
           <input name="display_order" type="number" defaultValue={cat?.display_order ?? 0} className={INPUT_CLS} />
         </div>
-        <div className="md:col-span-2">
+        <div className="">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Description</label>
           <input name="description" defaultValue={cat?.description || ""} className={INPUT_CLS} placeholder="Short description" />
         </div>
-        <div className="md:col-span-2">
+        <div className="">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Image</label>
           <ImageUpload bucket="things-to-do-images" folder="categories" onUpload={setImgUrl} currentUrl={imgUrl} />
           <input type="hidden" name="image_url" value={imgUrl} />
         </div>
-        <div className="md:col-span-2 flex gap-3">
+        <div className=" flex gap-3">
           <button type="submit" disabled={isPending} className="px-6 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition disabled:opacity-50">
             {isPending ? (isEdit ? "Saving..." : "Creating...") : (isEdit ? "Save Changes" : "Create Category")}
           </button>
@@ -204,9 +205,9 @@ export default function ThingsToDoManager({
     return (
       <form
         action={isEdit ? handleUpdateActivity : handleCreateActivity}
-        className="bg-white/[0.05] border border-white/10 rounded-2xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+        className="grid grid-cols-1 gap-4"
       >
-        <div className="md:col-span-2">
+        <div>
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Name *</label>
           <input name="name" required defaultValue={act?.name || ""} className={INPUT_CLS} placeholder="Activity name" />
         </div>
@@ -223,11 +224,11 @@ export default function ThingsToDoManager({
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Neighborhood</label>
           <input name="neighborhood" defaultValue={act?.neighborhood || ""} className={INPUT_CLS} placeholder="e.g. Short North" />
         </div>
-        <div className="md:col-span-2">
+        <div className="">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Description</label>
           <textarea name="description" rows={3} defaultValue={act?.description || ""} className={`${INPUT_CLS} resize-none`} placeholder="What makes this place special..." />
         </div>
-        <div className="md:col-span-2">
+        <div className="">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Address</label>
           <input name="address" defaultValue={act?.address || ""} className={INPUT_CLS} placeholder="Full address" />
         </div>
@@ -277,7 +278,7 @@ export default function ThingsToDoManager({
           <input type="checkbox" name="is_featured" value="true" id={isEdit ? "edit_is_featured" : "is_featured"} defaultChecked={act?.is_featured || false} className="rounded border-white/20" />
           <label htmlFor={isEdit ? "edit_is_featured" : "is_featured"} className="text-white/60 text-sm">Featured activity</label>
         </div>
-        <div className="md:col-span-2 flex gap-3">
+        <div className=" flex gap-3">
           <button type="submit" disabled={isPending} className="px-6 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition disabled:opacity-50">
             {isPending ? (isEdit ? "Saving..." : "Creating...") : (isEdit ? "Save Changes" : "Create Activity")}
           </button>
@@ -315,17 +316,19 @@ export default function ThingsToDoManager({
       {/* ════════════════════════════════════════ */}
       {tab === "categories" && (
         <div>
-          {!editingCat && (
-            <button
-              onClick={() => setShowCatForm(!showCatForm)}
-              className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
-            >
-              {showCatForm ? "Cancel" : "+ New Category"}
-            </button>
-          )}
+          <button
+            onClick={() => { setShowCatForm(true); setError(null); }}
+            className="mb-6 px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
+          >
+            + New Category
+          </button>
 
-          {showCatForm && !editingCat && renderCategoryForm("create")}
-          {editingCat && renderCategoryForm("edit", editingCat)}
+          <AdminSlidePanel isOpen={showCatForm && !editingCat} onClose={() => { setShowCatForm(false); setCatImageUrl(""); }} title="New Category">
+            {renderCategoryForm("create")}
+          </AdminSlidePanel>
+          <AdminSlidePanel isOpen={!!editingCat} onClose={() => { setEditingCat(null); setEditCatImageUrl(""); }} title="Edit Category">
+            {editingCat && renderCategoryForm("edit", editingCat)}
+          </AdminSlidePanel>
 
           {/* Category list */}
           {categories.length === 0 ? (
@@ -337,7 +340,7 @@ export default function ThingsToDoManager({
                   key={cat.id}
                   className={`bg-white/[0.05] border rounded-2xl p-5 flex items-center justify-between gap-4 transition ${
                     cat.is_active ? "border-white/10" : "border-white/5 opacity-50"
-                  } ${editingCat?.id === cat.id ? "ring-2 ring-accent" : ""}`}
+                  }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {cat.icon && <span className="text-2xl">{cat.icon}</span>}
@@ -373,14 +376,12 @@ export default function ThingsToDoManager({
       {tab === "activities" && (
         <div>
           <div className="flex flex-wrap items-center gap-3 mb-6">
-            {!editingAct && (
-              <button
-                onClick={() => setShowActForm(!showActForm)}
-                className="px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
-              >
-                {showActForm ? "Cancel" : "+ New Activity"}
-              </button>
-            )}
+            <button
+              onClick={() => { setShowActForm(true); setError(null); }}
+              className="px-5 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition"
+            >
+              + New Activity
+            </button>
             <select
               value={catFilter}
               onChange={(e) => setCatFilter(e.target.value)}
@@ -393,8 +394,12 @@ export default function ThingsToDoManager({
             </select>
           </div>
 
-          {showActForm && !editingAct && renderActivityForm("create")}
-          {editingAct && renderActivityForm("edit", editingAct)}
+          <AdminSlidePanel isOpen={showActForm && !editingAct} onClose={() => { setShowActForm(false); setActImageUrl(""); }} title="New Activity">
+            {renderActivityForm("create")}
+          </AdminSlidePanel>
+          <AdminSlidePanel isOpen={!!editingAct} onClose={() => { setEditingAct(null); setEditActImageUrl(""); }} title="Edit Activity">
+            {editingAct && renderActivityForm("edit", editingAct)}
+          </AdminSlidePanel>
 
           {/* Activity list */}
           {filteredActivities.length === 0 ? (
@@ -406,7 +411,7 @@ export default function ThingsToDoManager({
                   key={act.id}
                   className={`bg-white/[0.05] border rounded-2xl p-5 transition ${
                     act.is_active ? "border-white/10" : "border-white/5 opacity-50"
-                  } ${editingAct?.id === act.id ? "ring-2 ring-accent" : ""}`}
+                  }`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
