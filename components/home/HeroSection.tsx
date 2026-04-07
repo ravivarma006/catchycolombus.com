@@ -10,6 +10,8 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
+import type { FeaturedDeal } from "@/components/home/FeaturedDealsSection";
+import { CATEGORY_GRADIENTS } from "@/lib/coupon-utils";
 
 /* ────────────────────────── SLIDE DATA ────────────────────────── */
 interface Slide {
@@ -27,6 +29,7 @@ interface Slide {
 interface HeroSectionProps {
   slides: Slide[];
   stats: { value: string; label: string }[];
+  deals?: FeaturedDeal[];
 }
 
 /* ── Timing constants (ms) ── */
@@ -57,7 +60,7 @@ const fadeUp = {
 };
 
 /* ═══════════════════════════ COMPONENT ═══════════════════════════ */
-export default function HeroSection({ slides, stats }: HeroSectionProps) {
+export default function HeroSection({ slides, stats, deals = [] }: HeroSectionProps) {
   const [active, setActive] = useState(0);
   const [phase, setPhase]   = useState<"show" | "exiting">("show");
   const [paused, setPaused] = useState(false);
@@ -111,26 +114,29 @@ export default function HeroSection({ slides, stats }: HeroSectionProps) {
   if (slides.length === 0) {
     return (
       <section
-        className="relative w-full overflow-hidden bg-[#020C1B] flex items-center justify-center"
-        style={{ height: "calc(100vh - 64px)", minHeight: 640 }}
+        className="relative w-full overflow-hidden bg-[#020C1B] flex flex-col"
+        style={{ minHeight: "calc(100vh - 64px)" }}
       >
         <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #0F4C5C 0%, #020C1B 100%)" }} />
-        <div className="relative z-10 text-center px-6">
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-4" style={{ fontFamily: "'Outfit', sans-serif" }}>
-            Catch <span style={{ color: "var(--accent)" }}>Columbus</span>
-          </h1>
-          <p className="text-white/60 text-lg mb-8" style={{ fontFamily: "'Inter', sans-serif" }}>
-            Events, services, and hidden gems in the city you love.
-          </p>
-          <div className="flex items-center justify-center gap-3">
-            <Link href="/events" className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-2xl" style={{ backgroundColor: "var(--accent)", color: "#0F4C5C" }}>
-              Explore Events
-            </Link>
-            <Link href="/services" className="inline-flex items-center gap-2 font-semibold text-sm px-6 py-3 rounded-2xl" style={{ border: "1.5px solid rgba(255,255,255,0.30)", color: "rgba(255,255,255,0.85)", backgroundColor: "rgba(255,255,255,0.06)" }}>
-              Browse Services
-            </Link>
+        <div className="relative z-10 text-center px-6 flex-1 flex items-center justify-center">
+          <div>
+            <h1 className="text-5xl md:text-7xl font-black text-white mb-4" style={{ fontFamily: "'Outfit', sans-serif" }}>
+              Catch <span style={{ color: "var(--accent)" }}>Columbus</span>
+            </h1>
+            <p className="text-white/60 text-lg mb-8" style={{ fontFamily: "'Inter', sans-serif" }}>
+              Events, services, and hidden gems in the city you love.
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <Link href="/events" className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-2xl" style={{ backgroundColor: "var(--accent)", color: "#0F4C5C" }}>
+                Explore Events
+              </Link>
+              <Link href="/services" className="inline-flex items-center gap-2 font-semibold text-sm px-6 py-3 rounded-2xl" style={{ border: "1.5px solid rgba(255,255,255,0.30)", color: "rgba(255,255,255,0.85)", backgroundColor: "rgba(255,255,255,0.06)" }}>
+                Browse Services
+              </Link>
+            </div>
           </div>
         </div>
+        {renderDealsStrip()}
       </section>
     );
   }
@@ -144,6 +150,80 @@ export default function HeroSection({ slides, stats }: HeroSectionProps) {
   const safeOverlayFrom = isValidColor(slide.overlayFrom) ? slide.overlayFrom : "rgba(0,0,0,0.85)";
   const safeOverlayTo = isValidColor(slide.overlayTo) ? slide.overlayTo : "rgba(0,0,0,0.40)";
 
+  /* ── Deals strip renderer ── */
+  function renderDealsStrip() {
+    if (deals.length === 0) return null;
+    return (
+      <motion.div
+        className="relative z-20 border-t border-white/10 px-6 md:px-16 lg:px-24 py-5"
+        style={{ background: "linear-gradient(180deg, rgba(2,12,27,0.95) 0%, #020C1B 100%)" }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8, duration: 0.6 }}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {deals.map((deal) => {
+            const catSlug = deal.categorySlug ?? "default";
+            const gen = CATEGORY_GRADIENTS[catSlug] ?? CATEGORY_GRADIENTS.default;
+            return (
+              <Link key={deal.id} href={deal.href} className="group block">
+                <div className="flex rounded-2xl overflow-hidden border border-white/10 bg-[#0a1628] hover:border-accent/30 transition-all duration-300 h-[130px]">
+                  {/* Image side */}
+                  <div className="relative w-[40%] shrink-0 overflow-hidden">
+                    {deal.imageUrl ? (
+                      <Image
+                        src={deal.imageUrl}
+                        alt={deal.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        sizes="(max-width: 768px) 40vw, 15vw"
+                      />
+                    ) : (
+                      <div className={`absolute inset-0 bg-gradient-to-br ${gen.gradient}`} />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#0a1628]/80" />
+                    {/* Discount badge */}
+                    {deal.discountLabel && (
+                      <span
+                        className={`absolute top-2.5 left-2.5 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-lg ${
+                          deal.discountLabel === "FREE"
+                            ? "bg-emerald-500 text-white"
+                            : "bg-accent text-[#020C1B]"
+                        }`}
+                      >
+                        {deal.discountLabel}
+                      </span>
+                    )}
+                  </div>
+                  {/* Content side */}
+                  <div className="p-4 flex flex-col justify-center flex-1 min-w-0">
+                    {deal.categoryName && (
+                      <span
+                        className="text-[10px] font-bold tracking-[0.15em] uppercase mb-1.5 block"
+                        style={{ color: "var(--accent)" }}
+                      >
+                        {deal.categoryName}
+                      </span>
+                    )}
+                    <h3
+                      className="text-white font-bold text-sm uppercase leading-snug line-clamp-2 group-hover:text-accent transition-colors"
+                      style={{ fontFamily: "'Outfit', sans-serif" }}
+                    >
+                      {deal.title}
+                    </h3>
+                    {deal.description && (
+                      <p className="text-white/35 text-xs mt-1 line-clamp-1">{deal.description}</p>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </motion.div>
+    );
+  }
+
   /* pad slide number */
   const num = String(active + 1).padStart(2, "0");
   const total = String(slides.length).padStart(2, "0");
@@ -154,8 +234,8 @@ export default function HeroSection({ slides, stats }: HeroSectionProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full overflow-hidden bg-[#020C1B]"
-      style={{ height: "calc(100vh - 64px)", minHeight: 640 }}
+      className="relative w-full overflow-hidden bg-[#020C1B] flex flex-col"
+      style={{ minHeight: "calc(100vh - 64px)" }}
       onMouseMove={onMouseMove}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={onMouseLeave}
@@ -221,7 +301,7 @@ export default function HeroSection({ slides, stats }: HeroSectionProps) {
       />
 
       {/* ══════════════ MAIN LAYOUT GRID ══════════════ */}
-      <div className="absolute inset-0 flex flex-col justify-between px-6 md:px-16 lg:px-24 py-10 md:py-14">
+      <div className="relative z-10 flex-1 flex flex-col justify-between px-6 md:px-16 lg:px-24 py-10 md:py-14" style={{ minHeight: 640 }}>
 
         {/* ── TOP ROW : location tag + slide counter ── */}
         <AnimatePresence mode="wait">
@@ -446,6 +526,9 @@ export default function HeroSection({ slides, stats }: HeroSectionProps) {
           </motion.div>
         </div>
       </div>
+
+      {/* ══════════════ DEALS STRIP ══════════════ */}
+      {renderDealsStrip()}
 
       {/* ══════════════ DECORATIVE ELEMENTS ══════════════ */}
       <motion.div

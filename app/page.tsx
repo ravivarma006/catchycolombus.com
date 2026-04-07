@@ -7,7 +7,6 @@ import EventsCalendarSection from "@/components/home/EventsCalendarSection";
 import TrustSection from "@/components/home/TrustSection";
 import SubscribeForm from "@/components/SubscribeForm";
 import BannersSection from "@/components/home/BannersSection";
-import FeaturedDealsSection from "@/components/home/FeaturedDealsSection";
 import type { FeaturedDeal } from "@/components/home/FeaturedDealsSection";
 
 export default async function Home() {
@@ -138,8 +137,8 @@ export default async function Home() {
           overlayTo: row.overlay_to,
         }))}
         stats={(heroStats ?? []).map((s: any) => ({ value: s.value, label: s.label }))}
+        deals={featuredDeals}
       />
-      <FeaturedDealsSection deals={featuredDeals} />
       <CategoriesSection />
       <ThingsToDoSection activities={(featuredActivities ?? []).map((a: any) => ({
         ...a,
