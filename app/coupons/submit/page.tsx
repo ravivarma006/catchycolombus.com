@@ -20,6 +20,16 @@ export default async function CouponSubmitPage({
 
   if (!user) redirect("/auth/login?next=/coupons/submit");
 
+  // Admin-only — coupons are created by admins from the admin panel
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (profile?.role !== "admin") {
+    redirect("/dashboard");
+  }
+
   const { data: categories } = await supabase
     .from("coupon_categories")
     .select("id, name, slug")

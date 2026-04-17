@@ -155,10 +155,10 @@ export default function Navbar({ user }: NavbarProps) {
             {user ? (
               <>
                 <Link
-                  href="/dashboard"
+                  href={user.role === "admin" ? "/admin" : "/dashboard"}
                   className="text-sm font-semibold hover:text-primary transition"
                 >
-                  Dashboard
+                  {user.role === "admin" ? "Admin" : "Dashboard"}
                 </Link>
                 <form action={logout}>
                   <button
@@ -235,7 +235,12 @@ export default function Navbar({ user }: NavbarProps) {
           <div className="pt-2 mt-2 border-t border-gray-100">
             {user ? (
               <>
-                <Link href="/dashboard" className="block text-gray-700 hover:text-primary hover:bg-gray-50 px-2 py-1.5 rounded-md transition">Dashboard</Link>
+                <Link
+                  href={user.role === "admin" ? "/admin" : "/dashboard"}
+                  className="block text-gray-700 hover:text-primary hover:bg-gray-50 px-2 py-1.5 rounded-md transition"
+                >
+                  {user.role === "admin" ? "Admin Dashboard" : "Business Dashboard"}
+                </Link>
                 <form action={logout}>
                   <button type="submit" className="w-full text-left text-primary font-bold hover:bg-gray-50 px-2 py-1.5 rounded-md transition">
                     Sign Out

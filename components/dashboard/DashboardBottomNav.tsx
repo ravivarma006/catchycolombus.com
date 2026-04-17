@@ -57,11 +57,16 @@ export default function DashboardBottomNav({ email, role }: { email: string; rol
             <p className="text-white/40 text-xs font-bold uppercase tracking-widest px-4 pt-4 pb-2">
               Submit New
             </p>
-            {[
-              { href: "/events/submit", icon: "📅", label: "Submit an Event" },
-              { href: "/services/submit", icon: "🏢", label: "List Your Business" },
-              { href: "/coupons/submit", icon: "🏷️", label: "Submit a Coupon" },
-            ].map((item) => (
+            {(role === "admin"
+              ? [
+                  { href: "/services/submit", icon: "🏢", label: "List a Business" },
+                  { href: "/events/submit",   icon: "📅", label: "Submit an Event" },
+                  { href: "/coupons/submit",  icon: "🏷️", label: "Submit a Coupon" },
+                ]
+              : [
+                  { href: "/services/submit", icon: "🏢", label: "List Your Business" },
+                ]
+            ).map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

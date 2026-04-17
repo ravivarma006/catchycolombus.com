@@ -71,34 +71,47 @@ export default async function SubmissionsPage() {
 
   if (!user) redirect("/auth/login?next=/dashboard/submissions");
 
-  // Fetch all three request types in parallel
+  // Role: admins see all types; business users only see their business listings
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  const role = profile?.role ?? "visitor";
+  const showAllTypes = role === "admin";
+
+  // Always fetch provider requests; fetch events/coupons only for admins
   const [
-    { data: eventReqs },
     { data: providerReqs },
+    { data: eventReqs },
     { data: couponReqs },
   ] = await Promise.all([
-    supabase
-      .from("event_requests")
-      .select("id, event_name, email, event_date, status, admin_notes, created_at, updated_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false }),
     supabase
       .from("provider_requests")
       .select("id, business_name, email, status, admin_notes, created_at, updated_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
-    supabase
-      .from("coupon_requests")
-      .select("id, product_service_name, email, status, admin_notes, created_at, updated_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false }),
+    showAllTypes
+      ? supabase
+          .from("event_requests")
+          .select("id, event_name, email, event_date, status, admin_notes, created_at, updated_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+      : Promise.resolve({ data: [] }),
+    showAllTypes
+      ? supabase
+          .from("coupon_requests")
+          .select("id, product_service_name, email, status, admin_notes, created_at, updated_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+      : Promise.resolve({ data: [] }),
   ]);
 
-  const events   = (eventReqs   ?? []) as EventReq[];
   const providers = (providerReqs ?? []) as ProviderReq[];
-  const coupons  = (couponReqs  ?? []) as CouponReq[];
+  const events    = (eventReqs    ?? []) as EventReq[];
+  const coupons   = (couponReqs   ?? []) as CouponReq[];
 
-  const totalAll = events.length + providers.length + coupons.length;
+  const totalAll = providers.length + events.length + coupons.length;
 
   return (
     <div
@@ -129,28 +142,36 @@ export default async function SubmissionsPage() {
           <p className="text-white/50 mt-2 text-base">
             {totalAll === 0
               ? "You haven't submitted anything yet."
-              : `${totalAll} total submission${totalAll !== 1 ? "s" : ""} across events, businesses, and coupons.`}
+              : showAllTypes
+              ? `${totalAll} total submission${totalAll !== 1 ? "s" : ""} across events, businesses, and coupons.`
+              : `${providers.length} business listing${providers.length !== 1 ? "s" : ""} submitted.`}
           </p>
         </div>
 
         {totalAll === 0 ? (
           <div className="bg-white/[0.05] border border-white/10 rounded-3xl p-12 text-center">
-            <div className="text-6xl mb-4 opacity-30">📋</div>
-            <p className="text-white/50 font-semibold text-lg mb-2">No submissions yet</p>
-            <p className="text-white/30 text-sm mb-6">Start by submitting an event, business, or coupon.</p>
+            <div className="text-6xl mb-4 opacity-30">🏢</div>
+            <p className="text-white/50 font-semibold text-lg mb-2">No listings yet</p>
+            <p className="text-white/30 text-sm mb-6">
+              Start by submitting your business for review.
+            </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
-              <Link href="/events/submit"
-                className="bg-accent text-[#020C1B] font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-yellow-400 transition-all">
-                Submit Event
-              </Link>
               <Link href="/services/submit"
-                className="bg-white/10 border border-white/15 text-white font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-white/20 transition-all">
-                List Business
+                className="bg-accent text-[#020C1B] font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-yellow-400 transition-all">
+                + List Your Business
               </Link>
-              <Link href="/coupons/submit"
-                className="bg-white/10 border border-white/15 text-white font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-white/20 transition-all">
-                Submit Coupon
-              </Link>
+              {showAllTypes && (
+                <>
+                  <Link href="/events/submit"
+                    className="bg-white/10 border border-white/15 text-white font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-white/20 transition-all">
+                    Submit Event
+                  </Link>
+                  <Link href="/coupons/submit"
+                    className="bg-white/10 border border-white/15 text-white font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-white/20 transition-all">
+                    Submit Coupon
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         ) : (
