@@ -50,3 +50,6 @@ next-env.d.ts
 # Claude Code / MCP (contains tokens)
 .claude/
 .mcp.json
+
+# Scripts with hardcoded secrets
+update_coupons_images.mjs
