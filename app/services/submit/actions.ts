@@ -31,6 +31,14 @@ export async function submitProviderRequest(
     image_url:     formData.get("image_url"),
   };
 
+  // Collect optional extras not in Zod schema
+  const neighborhood = (formData.get("neighborhood") as string)?.trim() || null;
+  const hours        = (formData.get("hours")        as string)?.trim() || null;
+  const facebook     = (formData.get("facebook")     as string)?.trim() || null;
+  const instagram    = (formData.get("instagram")    as string)?.trim() || null;
+  const twitter      = (formData.get("twitter")      as string)?.trim() || null;
+  const social_links = { facebook, instagram, twitter };
+
   const parsed = providerRequestSchema.safeParse(raw);
   if (!parsed.success) {
     return { error: formatZodErrors(parsed.error) };
@@ -61,6 +69,12 @@ export async function submitProviderRequest(
     description:   data.description   || null,
     website:       data.website       || null,
     image_url:     data.image_url     || null,
+    social_links,
+    // Extra fields stored as notes for now (schema extensible later)
+    admin_notes:   [
+      neighborhood ? `Neighborhood: ${neighborhood}` : null,
+      hours        ? `Hours: ${hours}` : null,
+    ].filter(Boolean).join(" | ") || null,
     status:        "pending",
   });
 

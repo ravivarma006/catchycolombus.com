@@ -15,6 +15,11 @@ interface Category {
 
 const initialState = { error: "" };
 
+const inputClass =
+  "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all";
+
+const labelClass = "block text-xs font-bold text-white/50 uppercase tracking-widest mb-2";
+
 function SubmitBtn() {
   const { pending } = useFormStatus();
   return (
@@ -23,8 +28,19 @@ function SubmitBtn() {
       disabled={pending}
       className="flex-1 bg-accent hover:bg-yellow-400 disabled:opacity-60 disabled:cursor-not-allowed text-[#020C1B] font-black text-sm py-4 rounded-2xl transition-all hover:scale-[1.01] active:scale-95 shadow-lg shadow-amber-500/20"
     >
-      {pending ? "Submitting..." : "Submit Business for Review"}
+      {pending ? "Submitting…" : "Submit Business for Review"}
     </button>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8 space-y-5">
+      <p className="text-xs text-white/30 uppercase tracking-widest font-bold border-b border-white/10 pb-3">
+        {title}
+      </p>
+      {children}
+    </div>
   );
 }
 
@@ -34,11 +50,12 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
 
   return (
     <form action={formAction} className="space-y-5">
-      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8 space-y-5">
 
+      {/* ── Basic Info ── */}
+      <Section title="Business Information">
         {/* Business Name */}
         <div>
-          <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
+          <label className={labelClass}>
             Business Name <span className="text-red-400">*</span>
           </label>
           <input
@@ -46,21 +63,21 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
             type="text"
             required
             placeholder="Short North Plumbing Co."
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
+            className={inputClass}
           />
         </div>
 
         {/* Category */}
         <div>
-          <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
-            Category
-          </label>
+          <label className={labelClass}>Category</label>
           <select
             name="category_id"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all [color-scheme:dark]"
+            className={`${inputClass} [color-scheme:dark]`}
             defaultValue=""
           >
-            <option value="" disabled className="bg-[#0D1B3E] text-white">Select a category...</option>
+            <option value="" disabled className="bg-[#0D1B3E] text-white">
+              Select a category…
+            </option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id} className="bg-[#0D1B3E] text-white">
                 {cat.icon ? `${cat.icon} ` : ""}{cat.name}
@@ -71,100 +88,149 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
 
         {/* Business Type */}
         <div>
-          <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
-            Business Type / Specialty
-          </label>
+          <label className={labelClass}>Business Type / Specialty</label>
           <input
             name="business_type"
             type="text"
             placeholder="e.g. Residential Plumber, Family Restaurant"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
-          />
-        </div>
-
-        {/* Address */}
-        <div>
-          <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
-            Business Address
-          </label>
-          <input
-            name="address"
-            type="text"
-            placeholder="123 Main St, Columbus, OH 43215"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
+            className={inputClass}
           />
         </div>
 
         {/* Description */}
         <div>
-          <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
-            Description
-          </label>
+          <label className={labelClass}>Description</label>
           <textarea
             name="description"
             rows={4}
-            placeholder="Tell us about your business — services offered, years in business, what makes you stand out..."
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all resize-none"
+            placeholder="Tell us about your business — services offered, years in operation, what makes you stand out…"
+            className={`${inputClass} resize-none`}
           />
         </div>
 
-        {/* Website */}
+        {/* Address */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className={labelClass}>Business Address</label>
+            <input
+              name="address"
+              type="text"
+              placeholder="123 Main St, Columbus, OH 43215"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>Neighborhood / Area</label>
+            <input
+              name="neighborhood"
+              type="text"
+              placeholder="e.g. Short North, German Village"
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        {/* Hours */}
         <div>
-          <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
-            Website
-          </label>
+          <label className={labelClass}>Hours of Operation</label>
           <input
-            name="website"
-            type="url"
-            placeholder="https://yourbusiness.com"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
+            name="hours"
+            type="text"
+            placeholder="e.g. Mon–Fri 9am–6pm, Sat 10am–4pm, Closed Sun"
+            className={inputClass}
           />
         </div>
 
-        {/* Logo / Image Upload */}
+        {/* Logo / Image */}
         <div>
-          <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
-            Logo / Photo
-          </label>
+          <label className={labelClass}>Logo / Business Photo</label>
           <ImageUpload
             bucket="provider-images"
             folder="submissions"
             onUpload={(url) => setImageUrl(url)}
           />
           <input type="hidden" name="image_url" value={imageUrl} />
+          <p className="text-white/25 text-xs mt-2">
+            Upload a logo or a clear photo of your business. Max 5 MB (JPG, PNG, WebP).
+          </p>
         </div>
+      </Section>
 
-        {/* Contact info divider */}
-        <div className="border-t border-white/10 pt-5 space-y-4">
-          <p className="text-xs text-white/30 uppercase tracking-widest font-bold">Contact Info</p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
-                Email <span className="text-red-400">*</span>
-              </label>
-              <input
-                name="email"
-                type="email"
-                required
-                placeholder="owner@yourbusiness.com"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
-                Phone
-              </label>
-              <input
-                name="phone"
-                type="tel"
-                placeholder="(614) 555-0100"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
-              />
-            </div>
+      {/* ── Contact Info ── */}
+      <Section title="Contact Information">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className={labelClass}>
+              Email <span className="text-red-400">*</span>
+            </label>
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="owner@yourbusiness.com"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>Phone</label>
+            <input
+              name="phone"
+              type="tel"
+              placeholder="(614) 555-0100"
+              className={inputClass}
+            />
           </div>
         </div>
-      </div>
+
+        <div>
+          <label className={labelClass}>Website</label>
+          <input
+            name="website"
+            type="url"
+            placeholder="https://yourbusiness.com"
+            className={inputClass}
+          />
+        </div>
+      </Section>
+
+      {/* ── Social Media ── */}
+      <Section title="Social Media (optional)">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={labelClass}>
+              <span className="mr-1">📘</span> Facebook
+            </label>
+            <input
+              name="facebook"
+              type="url"
+              placeholder="https://facebook.com/yourbiz"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>
+              <span className="mr-1">📸</span> Instagram
+            </label>
+            <input
+              name="instagram"
+              type="url"
+              placeholder="https://instagram.com/yourbiz"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>
+              <span className="mr-1">🐦</span> Twitter / X
+            </label>
+            <input
+              name="twitter"
+              type="url"
+              placeholder="https://twitter.com/yourbiz"
+              className={inputClass}
+            />
+          </div>
+        </div>
+      </Section>
 
       {/* Error */}
       {state?.error && (
@@ -185,7 +251,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
       </div>
 
       <p className="text-xs text-white/30 text-center">
-        Submissions are reviewed within 1–2 business days. You&apos;ll be notified of the decision.
+        Submissions are reviewed within 1–2 business days. You&apos;ll see the status update in your dashboard.
       </p>
     </form>
   );

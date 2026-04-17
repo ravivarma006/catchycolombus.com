@@ -106,15 +106,30 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-white/40 mt-6">
-            Don&apos;t have an account?{" "}
+          <div className="mt-6 space-y-3">
+            <p className="text-center text-sm text-white/40">
+              Don&apos;t have an account?{" "}
+              <Link href="/auth/signup" className="text-accent font-semibold hover:underline">
+                Sign up
+              </Link>
+            </p>
+
+            {/* Business CTA */}
             <Link
-              href="/auth/signup"
-              className="text-accent font-semibold hover:underline"
+              href="/auth/business-signup"
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold transition-all hover:scale-[1.01]"
+              style={{
+                background: "rgba(245,168,0,0.1)",
+                border: "1px solid rgba(245,168,0,0.25)",
+                color: "#F5A800",
+              }}
             >
-              Sign up
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3M9 7h1m5 0h1M9 11h1m5 0h1M9 15h6" />
+              </svg>
+              Register Your Business — Free
             </Link>
-          </p>
+          </div>
         </div>
       </div>
     </div>

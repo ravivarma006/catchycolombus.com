@@ -185,8 +185,7 @@ function BottomSheet({ onClose }: { onClose: () => void }) {
                 style={{ background: "rgba(255,255,255,0.08)" }}
               >
                 <svg width="22" height="22" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h1m5 0h1M9 11h1m5 0h1M9 15h6" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                 </svg>
               </div>
               <div className="text-left">
@@ -194,7 +193,36 @@ function BottomSheet({ onClose }: { onClose: () => void }) {
                   Business Sign In
                 </p>
                 <p className="text-white/45 text-xs mt-0.5">
-                  List your business, events &amp; coupons
+                  Already have an account? Sign in here
+                </p>
+              </div>
+              <svg className="ml-auto shrink-0 text-white/30" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
+              </svg>
+            </Link>
+
+            {/* Register Business option */}
+            <Link
+              href="/auth/business-signup"
+              onClick={onClose}
+              className="w-full flex items-center gap-4 rounded-2xl px-5 py-4 transition-all active:scale-[0.98]"
+              style={{ background: "rgba(245,168,0,0.06)", border: "1px solid rgba(245,168,0,0.2)" }}
+            >
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: "rgba(245,168,0,0.12)" }}
+              >
+                <svg width="22" height="22" fill="none" stroke="#F5A800" strokeWidth="1.8" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h1m5 0h1M9 11h1m5 0h1M9 15h6" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-sm" style={{ color: "#F5A800", fontFamily: "'Outfit', sans-serif" }}>
+                  Register Your Business
+                </p>
+                <p className="text-white/45 text-xs mt-0.5">
+                  New here? List your business for free
                 </p>
               </div>
               <svg className="ml-auto shrink-0 text-white/30" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

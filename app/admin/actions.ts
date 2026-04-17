@@ -218,6 +218,7 @@ export async function approveProviderRequest(
     website:      req.website,
     image_url:    req.image_url,
     social_links: req.social_links ?? {},
+    user_id:      req.user_id ?? null,   // link listing back to its owner
     is_active:    true,
     approved_at:  new Date().toISOString(),
   });
