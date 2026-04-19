@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
-import ProviderSubmitForm from "./ProviderSubmitForm";
+import ProviderSubmitForm, { type ExistingRequest } from "./ProviderSubmitForm";
 
 export const metadata: Metadata = {
   title: "List Your Business — Catch Columbus",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default async function ProviderSubmitPage({
   searchParams,
 }: {
-  searchParams: { success?: string };
+  searchParams: { success?: string; edit?: string };
 }) {
   const supabase = createClient();
   const {
@@ -27,6 +27,41 @@ export default async function ProviderSubmitPage({
     .order("display_order", { ascending: true });
 
   const success = searchParams.success === "1";
+
+  // If editing, load the existing request (must be owned by user and editable)
+  let existing: ExistingRequest | undefined;
+  let adminNote: string | null = null;
+  const editId = searchParams.edit?.trim();
+  if (editId) {
+    const { data: row } = await supabase
+      .from("provider_requests")
+      .select("id, business_name, business_type, category_id, description, address, neighborhood, hours, image_url, email, phone, website, social_links, status, admin_notes, user_id")
+      .eq("id", editId)
+      .single();
+
+    if (!row || row.user_id !== user.id) {
+      redirect("/dashboard/submissions");
+    }
+    if (!["pending", "needs_changes"].includes(row.status)) {
+      redirect("/dashboard/submissions");
+    }
+    existing = {
+      id: row.id,
+      business_name: row.business_name,
+      business_type: row.business_type,
+      category_id: row.category_id,
+      description: row.description,
+      address: row.address,
+      neighborhood: row.neighborhood,
+      hours: row.hours,
+      image_url: row.image_url,
+      email: row.email,
+      phone: row.phone,
+      website: row.website,
+      social_links: row.social_links as ExistingRequest["social_links"],
+    };
+    adminNote = row.status === "needs_changes" ? row.admin_notes : null;
+  }
 
   return (
     <div
@@ -50,10 +85,16 @@ export default async function ProviderSubmitPage({
             className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight"
             style={{ fontFamily: "'Outfit', sans-serif" }}
           >
-            List Your <span style={{ color: "var(--accent)" }}>Business</span>
+            {existing ? (
+              <>Edit Your <span style={{ color: "var(--accent)" }}>Listing</span></>
+            ) : (
+              <>List Your <span style={{ color: "var(--accent)" }}>Business</span></>
+            )}
           </h1>
           <p className="text-white/50 mt-3 text-base leading-relaxed">
-            Submit your business for review. Once approved, it will appear in the Catch Columbus services directory.
+            {existing
+              ? "Update your business details below. Saving will put this listing back in review."
+              : "Submit your business for review. Once approved, it will appear in the Catch Columbus services directory."}
           </p>
         </div>
 
@@ -74,6 +115,8 @@ export default async function ProviderSubmitPage({
         ) : (
           <ProviderSubmitForm
             categories={(categories ?? []) as { id: string; name: string; slug: string; icon: string | null }[]}
+            existing={existing}
+            adminNote={adminNote}
           />
         )}
       </div>

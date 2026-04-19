@@ -45,6 +45,61 @@ export async function submitProviderRequest(
   }
 
   const data = parsed.data;
+  const editId = (formData.get("id") as string)?.trim() || null;
+
+  const payload = {
+    business_name: data.business_name,
+    business_type: data.business_type || null,
+    category_id:   data.category_id   || null,
+    email:         data.email,
+    phone:         data.phone         || null,
+    address:       data.address       || null,
+    description:   data.description   || null,
+    website:       data.website       || null,
+    image_url:     data.image_url     || null,
+    neighborhood,
+    hours,
+    social_links,
+  };
+
+  // ── Update existing request if editing ──────────────────────
+  if (editId) {
+    // Verify caller owns the request and it is in an editable state
+    const { data: existing, error: fetchErr } = await supabase
+      .from("provider_requests")
+      .select("id, user_id, status")
+      .eq("id", editId)
+      .single();
+
+    if (fetchErr || !existing) {
+      return { error: "Request not found." };
+    }
+    if (existing.user_id !== user.id) {
+      return { error: "You cannot edit someone else's submission." };
+    }
+    if (!["pending", "needs_changes"].includes(existing.status)) {
+      return { error: "This submission can no longer be edited." };
+    }
+
+    const { error: updateErr } = await supabase
+      .from("provider_requests")
+      .update({
+        ...payload,
+        // Re-queue for review; clear old admin feedback so the card reflects the new state
+        status:      "pending",
+        admin_notes: null,
+        updated_at:  new Date().toISOString(),
+      })
+      .eq("id", editId)
+      .eq("user_id", user.id);
+
+    if (updateErr) {
+      console.error("[submitProviderRequest:update]", updateErr.message);
+      return { error: "Could not save your changes. Please try again." };
+    }
+
+    redirect("/dashboard/submissions?updated=1");
+  }
 
   // ── Rate limit: max 5 pending provider requests per user ────
   const { count } = await supabase
@@ -57,25 +112,11 @@ export async function submitProviderRequest(
     return { error: "You already have 5 pending business requests. Please wait for them to be reviewed before submitting more." };
   }
 
-  // ── Insert ──────────────────────────────────────────────────
+  // ── Insert (new submission) ─────────────────────────────────
   const { error: dbError } = await supabase.from("provider_requests").insert({
-    user_id:       user.id,
-    business_name: data.business_name,
-    business_type: data.business_type || null,
-    category_id:   data.category_id   || null,
-    email:         data.email,
-    phone:         data.phone         || null,
-    address:       data.address       || null,
-    description:   data.description   || null,
-    website:       data.website       || null,
-    image_url:     data.image_url     || null,
-    social_links,
-    // Extra fields stored as notes for now (schema extensible later)
-    admin_notes:   [
-      neighborhood ? `Neighborhood: ${neighborhood}` : null,
-      hours        ? `Hours: ${hours}` : null,
-    ].filter(Boolean).join(" | ") || null,
-    status:        "pending",
+    user_id: user.id,
+    ...payload,
+    status:  "pending",
   });
 
   if (dbError) {

@@ -35,6 +35,7 @@ export default async function DashboardPage() {
     { count: approvedProviders },
     { count: rejectedProviders },
     { data: myListings },
+    { data: openSubmissionsData },
   ] = await Promise.all([
     supabase.from("provider_requests").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "pending"),
     supabase.from("provider_requests").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "needs_changes"),
@@ -49,10 +50,24 @@ export default async function DashboardPage() {
           .eq("is_active", true)
           .order("approved_at", { ascending: false })
       : Promise.resolve({ data: null }),
+    // Pending + needs_changes submissions so the user can see / edit them
+    (isBusiness || isAdmin)
+      ? supabase
+          .from("provider_requests")
+          .select("id, business_name, image_url, address, status, admin_notes, created_at, updated_at")
+          .eq("user_id", user.id)
+          .in("status", ["pending", "needs_changes"])
+          .order("updated_at", { ascending: false })
+      : Promise.resolve({ data: null }),
   ]);
 
   const firstName = profile?.full_name?.split(" ")[0] || "there";
   const listings  = (myListings ?? []) as any[];
+  const openSubmissions = (openSubmissionsData ?? []) as Array<{
+    id: string; business_name: string | null; image_url: string | null;
+    address: string | null; status: "pending" | "needs_changes";
+    admin_notes: string | null; created_at: string; updated_at: string | null;
+  }>;
 
   return (
     <div
@@ -203,6 +218,87 @@ export default async function DashboardPage() {
               </svg>
             </div>
           </Link>
+        )}
+
+        {/* ── Open Submissions (pending / needs_changes) ── */}
+        {(isBusiness || isAdmin) && openSubmissions.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2
+                className="text-white font-black text-lg flex items-center gap-2"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
+                <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                Your Submissions ({openSubmissions.length})
+              </h2>
+            </div>
+
+            <div className="space-y-3">
+              {openSubmissions.map((sub) => {
+                const needsChanges = sub.status === "needs_changes";
+                const borderCls = needsChanges ? "border-amber-500/30 hover:border-amber-500/60" : "border-blue-500/20 hover:border-blue-500/40";
+                const badgeCls  = needsChanges
+                  ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                  : "bg-blue-500/15 text-blue-300 border-blue-500/30";
+                const badgeLabel = needsChanges ? "Needs Changes" : "Pending Review";
+                return (
+                  <div
+                    key={sub.id}
+                    className={`bg-white/[0.06] border ${borderCls} rounded-2xl p-4 transition-all`}
+                  >
+                    <div className="flex gap-4 items-start">
+                      <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-white/10 flex items-center justify-center">
+                        {sub.image_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={sub.image_url} alt={sub.business_name ?? ""} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-2xl">🏢</span>
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3
+                            className="text-white font-black text-sm leading-tight truncate"
+                            style={{ fontFamily: "'Outfit', sans-serif" }}
+                          >
+                            {sub.business_name || "Untitled business"}
+                          </h3>
+                          <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${badgeCls}`}>
+                            {badgeLabel}
+                          </span>
+                        </div>
+                        {sub.address && <p className="text-white/40 text-xs mt-0.5 truncate">{sub.address}</p>}
+                        <p className="text-white/30 text-[11px] mt-0.5">
+                          Submitted {new Date(sub.created_at).toLocaleDateString()}
+                        </p>
+
+                        {needsChanges && sub.admin_notes && (
+                          <div className="mt-2 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/80 mb-0.5">Admin feedback</p>
+                            <p className="text-amber-200 text-xs leading-relaxed">{sub.admin_notes}</p>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-2 mt-3">
+                          <Link
+                            href={`/services/submit?edit=${sub.id}`}
+                            className={`inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
+                              needsChanges
+                                ? "bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30"
+                                : "bg-white/10 text-white/80 hover:bg-white/15 border border-white/15"
+                            }`}
+                          >
+                            ✏️ {needsChanges ? "Edit & Resubmit" : "Edit Submission"}
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
 
         {/* ── Live Listings ── */}

@@ -63,7 +63,11 @@ function StatusBadge({ status }: { status: Status }) {
   );
 }
 
-export default async function SubmissionsPage() {
+export default async function SubmissionsPage({
+  searchParams,
+}: {
+  searchParams: { updated?: string };
+}) {
   const supabase = createClient();
   const {
     data: { user },
@@ -147,6 +151,18 @@ export default async function SubmissionsPage() {
               : `${providers.length} business listing${providers.length !== 1 ? "s" : ""} submitted.`}
           </p>
         </div>
+
+        {searchParams.updated === "1" && (
+          <div className="mb-6 bg-green-500/10 border border-green-500/30 rounded-2xl px-5 py-4 flex items-start gap-3">
+            <span className="text-green-400 text-xl shrink-0 mt-0.5">✅</span>
+            <div>
+              <p className="text-green-300 font-bold text-sm">Changes saved</p>
+              <p className="text-green-300/70 text-xs mt-0.5">
+                Your listing has been re-queued for admin review.
+              </p>
+            </div>
+          </div>
+        )}
 
         {totalAll === 0 ? (
           <div className="bg-white/[0.05] border border-white/10 rounded-3xl p-12 text-center">
@@ -305,6 +321,7 @@ function SubmissionCard({
 }) {
   const isNeedsChanges = status === "needs_changes";
   const isApproved     = status === "approved";
+  const isPending      = status === "pending";
 
   return (
     <div className={`bg-white/[0.05] border rounded-2xl p-5 transition-all ${
@@ -347,12 +364,35 @@ function SubmissionCard({
       {/* Needs changes actions */}
       {isNeedsChanges && (
         <div className="mt-4 flex items-center gap-3 flex-wrap">
-          <ResubmitButton id={id} type={type} />
+          {type === "provider" ? (
+            <Link
+              href={`/services/submit?edit=${id}`}
+              className="bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 text-xs font-bold px-4 py-2 rounded-xl transition-all"
+            >
+              ✏️ Edit &amp; Resubmit
+            </Link>
+          ) : (
+            <>
+              <ResubmitButton id={id} type={type} />
+              <Link
+                href={editHref}
+                className="text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/20 px-4 py-2 rounded-xl font-semibold transition-all"
+              >
+                Submit a new revised request
+              </Link>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Pending — allow editing for providers */}
+      {isPending && type === "provider" && (
+        <div className="mt-4">
           <Link
-            href={editHref}
-            className="text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/20 px-4 py-2 rounded-xl font-semibold transition-all"
+            href={`/services/submit?edit=${id}`}
+            className="inline-flex items-center gap-1 text-xs font-bold bg-white/10 text-white/80 hover:bg-white/15 border border-white/15 px-3 py-1.5 rounded-lg transition-all"
           >
-            Submit a new revised request
+            ✏️ Edit Submission
           </Link>
         </div>
       )}

@@ -13,6 +13,22 @@ interface Category {
   icon: string | null;
 }
 
+export interface ExistingRequest {
+  id: string;
+  business_name: string | null;
+  business_type: string | null;
+  category_id: string | null;
+  description: string | null;
+  address: string | null;
+  neighborhood: string | null;
+  hours: string | null;
+  image_url: string | null;
+  email: string | null;
+  phone: string | null;
+  website: string | null;
+  social_links: { facebook?: string; instagram?: string; twitter?: string } | null;
+}
+
 const initialState = { error: "" };
 
 const inputClass =
@@ -20,7 +36,7 @@ const inputClass =
 
 const labelClass = "block text-xs font-bold text-white/50 uppercase tracking-widest mb-2";
 
-function SubmitBtn() {
+function SubmitBtn({ editing }: { editing: boolean }) {
   const { pending } = useFormStatus();
   return (
     <button
@@ -28,7 +44,9 @@ function SubmitBtn() {
       disabled={pending}
       className="flex-1 bg-accent hover:bg-yellow-400 disabled:opacity-60 disabled:cursor-not-allowed text-[#020C1B] font-black text-sm py-4 rounded-2xl transition-all hover:scale-[1.01] active:scale-95 shadow-lg shadow-amber-500/20"
     >
-      {pending ? "Submitting…" : "Submit Business for Review"}
+      {pending
+        ? (editing ? "Saving…" : "Submitting…")
+        : (editing ? "Save Changes & Resubmit" : "Submit Business for Review")}
     </button>
   );
 }
@@ -44,12 +62,38 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export default function ProviderSubmitForm({ categories }: { categories: Category[] }) {
+export default function ProviderSubmitForm({
+  categories,
+  existing,
+  adminNote,
+}: {
+  categories: Category[];
+  existing?: ExistingRequest;
+  adminNote?: string | null;
+}) {
   const [state, formAction] = useFormState(submitProviderRequest, initialState);
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState(existing?.image_url ?? "");
+  const editing = Boolean(existing);
+  const social = existing?.social_links ?? {};
 
   return (
     <form action={formAction} className="space-y-5">
+
+      {/* Hidden id for edit mode */}
+      {editing && <input type="hidden" name="id" value={existing!.id} />}
+
+      {/* Admin feedback banner (if editing after needs_changes) */}
+      {editing && adminNote && (
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl px-5 py-4">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/80 mb-1">
+            Admin Feedback
+          </p>
+          <p className="text-amber-200 text-sm leading-relaxed">{adminNote}</p>
+          <p className="text-amber-300/60 text-xs mt-2">
+            Update the fields below and click <strong>Save Changes &amp; Resubmit</strong> — your listing will be re-queued for review.
+          </p>
+        </div>
+      )}
 
       {/* ── Basic Info ── */}
       <Section title="Business Information">
@@ -62,6 +106,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
             name="business_name"
             type="text"
             required
+            defaultValue={existing?.business_name ?? ""}
             placeholder="Short North Plumbing Co."
             className={inputClass}
           />
@@ -73,7 +118,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
           <select
             name="category_id"
             className={`${inputClass} [color-scheme:dark]`}
-            defaultValue=""
+            defaultValue={existing?.category_id ?? ""}
           >
             <option value="" disabled className="bg-[#0D1B3E] text-white">
               Select a category…
@@ -92,6 +137,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
           <input
             name="business_type"
             type="text"
+            defaultValue={existing?.business_type ?? ""}
             placeholder="e.g. Residential Plumber, Family Restaurant"
             className={inputClass}
           />
@@ -103,6 +149,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
           <textarea
             name="description"
             rows={4}
+            defaultValue={existing?.description ?? ""}
             placeholder="Tell us about your business — services offered, years in operation, what makes you stand out…"
             className={`${inputClass} resize-none`}
           />
@@ -115,6 +162,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
             <input
               name="address"
               type="text"
+              defaultValue={existing?.address ?? ""}
               placeholder="123 Main St, Columbus, OH 43215"
               className={inputClass}
             />
@@ -124,6 +172,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
             <input
               name="neighborhood"
               type="text"
+              defaultValue={existing?.neighborhood ?? ""}
               placeholder="e.g. Short North, German Village"
               className={inputClass}
             />
@@ -136,6 +185,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
           <input
             name="hours"
             type="text"
+            defaultValue={existing?.hours ?? ""}
             placeholder="e.g. Mon–Fri 9am–6pm, Sat 10am–4pm, Closed Sun"
             className={inputClass}
           />
@@ -144,6 +194,15 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
         {/* Logo / Image */}
         <div>
           <label className={labelClass}>Logo / Business Photo</label>
+          {imageUrl && (
+            <div className="mb-3 relative rounded-xl overflow-hidden border border-white/10 max-w-sm">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={imageUrl} alt="Current logo" className="w-full h-40 object-cover" />
+              <span className="absolute top-2 left-2 text-[10px] font-bold bg-black/60 text-white/80 px-2 py-1 rounded-md backdrop-blur-sm">
+                Current image
+              </span>
+            </div>
+          )}
           <ImageUpload
             bucket="provider-images"
             folder="submissions"
@@ -151,7 +210,9 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
           />
           <input type="hidden" name="image_url" value={imageUrl} />
           <p className="text-white/25 text-xs mt-2">
-            Upload a logo or a clear photo of your business. Max 5 MB (JPG, PNG, WebP).
+            {editing
+              ? "Upload a new image to replace the current one, or leave as is."
+              : "Upload a logo or a clear photo of your business. Max 5 MB (JPG, PNG, WebP)."}
           </p>
         </div>
       </Section>
@@ -167,6 +228,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
               name="email"
               type="email"
               required
+              defaultValue={existing?.email ?? ""}
               placeholder="owner@yourbusiness.com"
               className={inputClass}
             />
@@ -176,6 +238,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
             <input
               name="phone"
               type="tel"
+              defaultValue={existing?.phone ?? ""}
               placeholder="(614) 555-0100"
               className={inputClass}
             />
@@ -187,6 +250,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
           <input
             name="website"
             type="url"
+            defaultValue={existing?.website ?? ""}
             placeholder="https://yourbusiness.com"
             className={inputClass}
           />
@@ -203,6 +267,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
             <input
               name="facebook"
               type="url"
+              defaultValue={social.facebook ?? ""}
               placeholder="https://facebook.com/yourbiz"
               className={inputClass}
             />
@@ -214,6 +279,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
             <input
               name="instagram"
               type="url"
+              defaultValue={social.instagram ?? ""}
               placeholder="https://instagram.com/yourbiz"
               className={inputClass}
             />
@@ -225,6 +291,7 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
             <input
               name="twitter"
               type="url"
+              defaultValue={social.twitter ?? ""}
               placeholder="https://twitter.com/yourbiz"
               className={inputClass}
             />
@@ -241,9 +308,9 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
 
       {/* Actions */}
       <div className="flex items-center gap-4">
-        <SubmitBtn />
+        <SubmitBtn editing={editing} />
         <Link
-          href="/services"
+          href={editing ? "/dashboard/submissions" : "/services"}
           className="px-6 py-4 rounded-2xl border border-white/10 text-white/60 hover:text-white hover:border-white/20 text-sm font-semibold transition-all"
         >
           Cancel
@@ -251,7 +318,9 @@ export default function ProviderSubmitForm({ categories }: { categories: Categor
       </div>
 
       <p className="text-xs text-white/30 text-center">
-        Submissions are reviewed within 1–2 business days. You&apos;ll see the status update in your dashboard.
+        {editing
+          ? "Your changes will put this listing back in review. Admin will notify you once it's approved."
+          : "Submissions are reviewed within 1–2 business days. You'll see the status update in your dashboard."}
       </p>
     </form>
   );
