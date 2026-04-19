@@ -173,7 +173,7 @@ export async function approveEventRequest(
 
   if (insertErr) {
     console.error("[approveEventRequest insert]", insertErr.message);
-    return { error: "Could not create event listing." };
+    return { error: `Could not create event listing: ${insertErr.message}` };
   }
 
   // Mark request approved
@@ -225,7 +225,7 @@ export async function approveProviderRequest(
 
   if (insertErr) {
     console.error("[approveProviderRequest insert]", insertErr.message);
-    return { error: "Could not create business listing." };
+    return { error: `Could not create business listing: ${insertErr.message}` };
   }
 
   await supabase
@@ -273,7 +273,7 @@ export async function approveCouponRequest(
 
   if (insertErr) {
     console.error("[approveCouponRequest insert]", insertErr.message);
-    return { error: "Could not create coupon listing." };
+    return { error: `Could not create coupon listing: ${insertErr.message}` };
   }
 
   await supabase
