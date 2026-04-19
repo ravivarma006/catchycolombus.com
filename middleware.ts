@@ -34,7 +34,36 @@ export async function middleware(request: NextRequest) {
   );
 
   // Refresh session
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+
+  // ──────────────────────────────────────────────────────────
+  // Admin route guard — only admins can enter /admin/*
+  // ──────────────────────────────────────────────────────────
+  if (pathname.startsWith("/admin")) {
+    if (!user) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/auth/login";
+      loginUrl.searchParams.set("next", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.role !== "admin") {
+      const dashUrl = request.nextUrl.clone();
+      dashUrl.pathname = "/dashboard";
+      dashUrl.search = "";
+      return NextResponse.redirect(dashUrl);
+    }
+  }
 
   return supabaseResponse;
 }
