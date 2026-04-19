@@ -78,7 +78,7 @@ export default async function AdminCouponsPage() {
                   { label: "Phone",        value: req.phone },
                   { label: "Email",        value: req.email },
                   { label: "Website",      value: req.website },
-                  { label: "Image URL",    value: req.image_url },
+                  { label: "Uploaded Image", value: req.image_url, kind: "image" as const },
                   { label: "Description",  value: req.description },
                 ]}
               />

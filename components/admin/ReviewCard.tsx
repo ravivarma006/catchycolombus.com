@@ -40,7 +40,7 @@ export interface ReviewCardProps {
   adminNotes: string | null;
   createdAt: string;
   submittedBy?: string | null;
-  details: { label: string; value: string | null }[];
+  details: { label: string; value: string | null; kind?: "text" | "image" }[];
 }
 
 export default function ReviewCard({
@@ -124,14 +124,42 @@ export default function ReviewCard({
       {/* Expanded details */}
       {expanded && (
         <div className="px-5 pb-5 space-y-4 border-t border-white/5 pt-4">
-          {/* Details grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {details.filter((d) => d.value).map((d) => (
+          {/* Image previews (full width) */}
+          {details
+            .filter((d) => d.kind === "image" && d.value)
+            .map((d) => (
               <div key={d.label}>
-                <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-0.5">{d.label}</p>
-                <p className="text-white/80 text-sm break-words">{d.value}</p>
+                <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5">{d.label}</p>
+                <a
+                  href={d.value as string}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block relative rounded-xl overflow-hidden border border-white/10 bg-black/30 hover:border-white/30 transition-all group max-w-sm"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={d.value as string}
+                    alt={d.label}
+                    className="w-full h-48 object-cover group-hover:scale-[1.02] transition-transform"
+                  />
+                  <span className="absolute top-2 right-2 text-[10px] font-bold bg-black/60 text-white/80 px-2 py-1 rounded-md backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                    Open full size ↗
+                  </span>
+                </a>
+                <p className="text-white/25 text-[10px] mt-1.5 break-all leading-tight">{d.value}</p>
               </div>
             ))}
+
+          {/* Details grid — text fields only */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {details
+              .filter((d) => d.value && d.kind !== "image")
+              .map((d) => (
+                <div key={d.label}>
+                  <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-0.5">{d.label}</p>
+                  <p className="text-white/80 text-sm break-words">{d.value}</p>
+                </div>
+              ))}
           </div>
 
           {/* Existing admin notes */}

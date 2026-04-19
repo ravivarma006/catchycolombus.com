@@ -66,7 +66,7 @@ export default async function AdminEventsPage() {
                   { label: "Email",        value: req.email },
                   { label: "Phone",        value: req.phone },
                   { label: "Website",      value: req.website },
-                  { label: "Image URL",    value: req.image_url },
+                  { label: "Uploaded Image", value: req.image_url, kind: "image" as const },
                   { label: "Description",  value: req.description },
                 ]}
               />
