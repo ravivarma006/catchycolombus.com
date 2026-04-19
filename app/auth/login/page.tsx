@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { login } from "../actions";
 
@@ -10,6 +11,8 @@ export default function LoginPage() {
   const [tab, setTab]     = useState<Tab>("business");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const registered = searchParams.get("registered") === "1";
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -121,6 +124,12 @@ export default function LoginPage() {
                 : "Review submissions and manage the platform"}
             </p>
           </div>
+
+          {registered && (
+            <div className="mb-5 p-3 bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl text-sm">
+              Account created! Please check your email to confirm, then sign in below.
+            </div>
+          )}
 
           {error && (
             <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm">

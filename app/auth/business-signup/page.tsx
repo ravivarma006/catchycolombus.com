@@ -85,8 +85,8 @@ export default function BusinessSignupPage() {
           <div className="grid grid-cols-3 gap-3 mb-7">
             {[
               { icon: "📍", label: "Get Discovered" },
-              { icon: "🎟️", label: "Post Coupons" },
-              { icon: "📅", label: "List Events" },
+              { icon: "📣", label: "Reach Locals" },
+              { icon: "⭐", label: "Build Presence" },
             ].map((perk) => (
               <div
                 key={perk.label}

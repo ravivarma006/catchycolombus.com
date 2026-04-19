@@ -22,6 +22,9 @@ export default async function DashboardLayout({
 
   const role = profile?.role ?? "visitor";
 
+  // Admin users should always land on the admin dashboard
+  if (role === "admin") redirect("/admin");
+
   return (
     <div className="pb-20 md:pb-0">
       {children}

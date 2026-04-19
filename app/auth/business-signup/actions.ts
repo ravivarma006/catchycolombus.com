@@ -32,8 +32,9 @@ export async function businessSignup(formData: FormData) {
     return { error: error.message };
   }
 
-  if (!data.user) {
-    return { error: "Signup failed. Please try again." };
+  // Supabase silently returns a user with no identities when the email already exists
+  if (!data.user || !data.user.identities || data.user.identities.length === 0) {
+    return { error: "An account with this email already exists. Please sign in instead." };
   }
 
   // 2. Upgrade role to business_user via service-role client (bypasses RLS)
@@ -44,10 +45,16 @@ export async function businessSignup(formData: FormData) {
     .eq("id", data.user.id);
 
   if (roleErr) {
-    // Non-fatal: user can still log in; admin can fix role manually
     console.error("[businessSignup] role update failed:", roleErr.message);
   }
 
   revalidatePath("/", "layout");
+
+  // If there's no session the project requires email confirmation.
+  // Redirect to login with a flag so the user sees a success message.
+  if (!data.session) {
+    redirect("/auth/login?registered=1");
+  }
+
   redirect("/dashboard");
 }
