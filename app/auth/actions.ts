@@ -70,7 +70,7 @@ export async function forgotPassword(formData: FormData) {
 
   const { error } = await supabase.auth.resetPasswordForEmail(
     formData.get("email") as string,
-    { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://catchcolumbus.com"}/auth/reset-password` }
+    { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://columbus-wine.vercel.app"}/auth/callback?next=/auth/reset-password` }
   );
 
   if (error) {

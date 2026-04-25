@@ -1,12 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { resetPassword } from "../actions";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [exchanging, setExchanging] = useState(false);
+
+  useEffect(() => {
+    const code = searchParams.get("code");
+    if (code) {
+      setExchanging(true);
+      router.replace(`/auth/callback?code=${code}&next=/auth/reset-password`);
+    }
+  }, [searchParams, router]);
 
   async function handleSubmit(formData: FormData) {
     const password = formData.get("password") as string;
@@ -41,6 +53,74 @@ export default function ResetPasswordPage() {
     }
   }
 
+  if (exchanging) {
+    return (
+      <div className="text-center text-white/60 text-sm py-8">
+        Verifying reset link…
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-3xl p-8">
+      <h1
+        className="text-2xl font-bold text-white mb-1 text-center"
+        style={{ fontFamily: "'Outfit', sans-serif" }}
+      >
+        Set new password
+      </h1>
+      <p className="text-sm text-white/40 text-center mb-7">
+        Choose a strong password for your account.
+      </p>
+
+      {error && (
+        <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm">
+          {error}
+        </div>
+      )}
+
+      <form action={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
+            New Password
+          </label>
+          <input
+            name="password"
+            type="password"
+            required
+            minLength={8}
+            placeholder="Min. 8 chars, 1 uppercase, 1 number"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
+            Confirm Password
+          </label>
+          <input
+            name="confirm_password"
+            type="password"
+            required
+            minLength={8}
+            placeholder="••••••••"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-accent hover:bg-yellow-400 disabled:opacity-60 text-[#020C1B] font-black text-sm py-3.5 rounded-xl transition-all hover:scale-[1.01] active:scale-95 mt-2"
+        >
+          {loading ? "Updating..." : "Update Password"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export default function ResetPasswordPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 py-12"
@@ -56,7 +136,6 @@ export default function ResetPasswordPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/">
             <span
@@ -68,61 +147,11 @@ export default function ResetPasswordPage() {
           </Link>
         </div>
 
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-3xl p-8">
-          <h1
-            className="text-2xl font-bold text-white mb-1 text-center"
-            style={{ fontFamily: "'Outfit', sans-serif" }}
-          >
-            Set new password
-          </h1>
-          <p className="text-sm text-white/40 text-center mb-7">
-            Choose a strong password for your account.
-          </p>
-
-          {error && (
-            <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm">
-              {error}
-            </div>
-          )}
-
-          <form action={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
-                New Password
-              </label>
-              <input
-                name="password"
-                type="password"
-                required
-                minLength={8}
-                placeholder="Min. 8 chars, 1 uppercase, 1 number"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
-                Confirm Password
-              </label>
-              <input
-                name="confirm_password"
-                type="password"
-                required
-                minLength={8}
-                placeholder="••••••••"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent/60 focus:bg-white/10 transition-all"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-accent hover:bg-yellow-400 disabled:opacity-60 text-[#020C1B] font-black text-sm py-3.5 rounded-xl transition-all hover:scale-[1.01] active:scale-95 mt-2"
-            >
-              {loading ? "Updating..." : "Update Password"}
-            </button>
-          </form>
-        </div>
+        <Suspense fallback={
+          <div className="text-center text-white/60 text-sm py-8">Loading…</div>
+        }>
+          <ResetPasswordForm />
+        </Suspense>
       </div>
     </div>
   );
