@@ -78,9 +78,8 @@ export default async function CouponsPage() {
             >
               Coupons &amp; <span style={{ color: "var(--accent)" }}>Deals</span>
             </h1>
-            <p className="text-white/60 mt-3 text-lg font-medium max-w-xl">
-              Exclusive discounts from local Columbus businesses — show the code or
-              mention Catch Columbus.
+            <p className="text-white/60 mt-3 text-lg font-medium max-w-4xl">
+              Exclusive discounts from local Columbus businesses — show the code or mention Catch Columbus.
             </p>
           </div>
 

@@ -76,9 +76,8 @@ export default async function ServicesPage() {
         >
           Services <span style={{ color: "var(--accent)" }}>Directory</span>
         </h1>
-        <p className="text-gray-500 mt-3 text-lg font-medium max-w-xl">
-          Find trusted local businesses across Columbus — from dining to home
-          improvement.
+        <p className="text-gray-500 mt-3 text-lg font-medium max-w-4xl">
+          Find trusted local businesses across Columbus, from dining to home improvement.
         </p>
       </div>
 

@@ -90,7 +90,7 @@ export default async function ThingsToDoPage() {
         >
           Things to <span style={{ color: "var(--accent)" }}>Do</span>
         </h1>
-        <p className="text-gray-500 mt-3 text-lg font-medium max-w-xl">
+        <p className="text-gray-500 mt-3 text-lg font-medium max-w-4xl">
           Explore attractions, museums, parks, shopping, and more across Columbus.
         </p>
       </div>
