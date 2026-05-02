@@ -226,10 +226,10 @@ function TimelineSection() {
 
       <div ref={containerRef} className="relative">
         {/* Gray track — always visible */}
-        <div className="absolute left-5 md:left-1/2 top-0 bottom-0 w-px bg-gray-200/80 transform md:-translate-x-px" />
+        <div className="absolute left-5 md:left-1/2 top-0 bottom-0 w-px bg-gray-200/80 -translate-x-1/2" />
 
         {/* Gold animated fill — grows top→bottom as you scroll */}
-        <div className="absolute left-5 md:left-1/2 top-0 bottom-0 w-px transform md:-translate-x-px overflow-hidden">
+        <div className="absolute left-5 md:left-1/2 top-0 bottom-0 w-px -translate-x-1/2 overflow-hidden">
           <motion.div
             className="w-full h-full"
             style={{
