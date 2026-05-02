@@ -9,12 +9,18 @@ export async function businessSignup(formData: FormData) {
   const email      = (formData.get("email")      as string)?.trim();
   const password   = (formData.get("password")   as string);
   const full_name  = (formData.get("full_name")  as string)?.trim();
+  const phone      = (formData.get("phone")      as string)?.trim();
 
-  if (!email || !password || !full_name) {
+  if (!email || !password || !full_name || !phone) {
     return { error: "All fields are required." };
   }
   if (password.length < 8) {
     return { error: "Password must be at least 8 characters." };
+  }
+  // Basic phone validation — must contain at least 10 digits
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 10) {
+    return { error: "Please enter a valid phone number (at least 10 digits)." };
   }
 
   const supabase = createClient();
@@ -24,7 +30,7 @@ export async function businessSignup(formData: FormData) {
     email,
     password,
     options: {
-      data: { full_name },
+      data: { full_name, phone },
     },
   });
 
@@ -41,7 +47,7 @@ export async function businessSignup(formData: FormData) {
   const admin = createAdminClient();
   const { error: roleErr } = await admin
     .from("profiles")
-    .update({ role: "business_user" })
+    .update({ role: "business_user", phone })
     .eq("id", data.user.id);
 
   if (roleErr) {
