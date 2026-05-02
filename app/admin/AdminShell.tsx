@@ -11,7 +11,7 @@ const NAV = [
   { href: "/admin/things-to-do",  label: "Things to Do",   icon: "🎯" },
   { href: "/admin/services",      label: "Businesses",     icon: "🏢" },
   { href: "/admin/coupons",       label: "Coupons",        icon: "🏷️" },
-  { href: "/admin/announcements", label: "Announcements",  icon: "📢" },
+  { href: "/admin/announcements", label: "Catch us",       icon: "📢" },
   { href: "/admin/subscribers",   label: "Subscribers",    icon: "📧" },
 ];
 

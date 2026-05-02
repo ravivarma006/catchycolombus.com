@@ -13,7 +13,7 @@ const NAV_LINKS = [
   { href: "/things-to-do", label: "Things to Do" },
   { href: "/services", label: "Services" },
   { href: "/coupons", label: "Coupons" },
-  { href: "/announcements", label: "Announcements" },
+  { href: "/announcements", label: "Catch us" },
 ];
 
 interface NavbarProps {
@@ -89,18 +89,29 @@ export default function Navbar({ user }: NavbarProps) {
 
           {/* Desktop Nav */}
           {!searchOpen && (
-            <div className="hidden md:flex items-center gap-6 text-sm font-semibold">
+            <div className="hidden md:flex items-center gap-1 text-sm font-semibold">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`hover:text-primary transition ${
+                  className={`relative group px-3 py-1.5 rounded-lg transition-all duration-200 ${
                     isActive(link.href)
-                      ? "text-primary border-b-2 border-accent pb-0.5"
-                      : ""
+                      ? "text-primary bg-primary/10"
+                      : "text-gray-600 hover:text-primary hover:bg-primary/5"
                   }`}
                 >
-                  {link.label}
+                  {/* Label with subtle tracking shift on hover */}
+                  <span className="relative z-10 transition-all duration-200 group-hover:tracking-wide">
+                    {link.label}
+                  </span>
+                  {/* Sliding gold underline */}
+                  <span
+                    className={`absolute bottom-0.5 left-3 right-3 h-[2px] rounded-full bg-accent transition-all duration-300 ease-out origin-left ${
+                      isActive(link.href)
+                        ? "scale-x-100 opacity-100"
+                        : "scale-x-0 opacity-0 group-hover:scale-x-100 group-hover:opacity-100"
+                    }`}
+                  />
                 </Link>
               ))}
             </div>
@@ -218,15 +229,15 @@ export default function Navbar({ user }: NavbarProps) {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 px-4 py-3 space-y-2 text-sm font-semibold">
+        <div className="md:hidden bg-white border-t border-gray-100 px-4 py-3 space-y-1 text-sm font-semibold">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`block hover:text-primary hover:bg-gray-50 px-2 py-1.5 rounded-md transition ${
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 ${
                 isActive(link.href)
-                  ? "text-primary bg-gray-50 border-l-2 border-accent"
-                  : "text-gray-700"
+                  ? "text-primary bg-primary/10 border-l-[3px] border-accent pl-3"
+                  : "text-gray-700 hover:text-primary hover:bg-primary/5 hover:pl-4 border-l-[3px] border-transparent"
               }`}
             >
               {link.label}

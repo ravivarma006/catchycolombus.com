@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const revalidate = 300; // 5 minutes
 
 export const metadata: Metadata = {
-  title: "City Announcements — Catch Columbus",
+  title: "Catch us — Catch Columbus",
   description: "Latest news and announcements from Columbus, Ohio.",
 };
 
@@ -33,7 +33,7 @@ export default async function AnnouncementsPage() {
             className="text-4xl md:text-5xl font-black text-white mb-3"
             style={{ fontFamily: "'Outfit', sans-serif" }}
           >
-            City Announcements
+            Catch us
           </h1>
           <p className="text-white/60 text-lg max-w-xl">
             The latest news, updates, and important information for Columbus residents and visitors.

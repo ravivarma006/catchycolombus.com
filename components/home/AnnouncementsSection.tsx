@@ -32,7 +32,7 @@ export default function AnnouncementsSection({ announcements }: AnnouncementsSec
               className="text-2xl font-black text-foreground"
               style={{ fontFamily: "'Outfit', sans-serif" }}
             >
-              City Announcements
+              Catch us
             </h2>
           </div>
           <Link

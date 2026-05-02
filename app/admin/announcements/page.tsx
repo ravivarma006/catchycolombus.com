@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 import AnnouncementsManager from "./AnnouncementsManager";
 
-export const metadata: Metadata = { title: "Announcements" };
+export const metadata: Metadata = { title: "Catch us" };
 
 export default async function AdminAnnouncementsPage() {
   const supabase = createClient();
@@ -20,7 +20,7 @@ export default async function AdminAnnouncementsPage() {
           className="text-4xl font-black text-white mb-2"
           style={{ fontFamily: "'Outfit', sans-serif" }}
         >
-          Announcements
+          Catch us
         </h1>
         <p className="text-white/40 text-sm">
           Create and manage city announcements visible to all visitors.

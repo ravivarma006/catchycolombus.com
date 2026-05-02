@@ -86,7 +86,7 @@ export default async function AdminOverviewPage() {
     },
     {
       href:    "/admin/announcements",
-      label:   "Announcements",
+      label:   "Catch us",
       icon:    "📢",
       pending: counts.activeAnnouncements,
       color:   "from-violet-500/20 to-violet-600/10 border-violet-500/20",

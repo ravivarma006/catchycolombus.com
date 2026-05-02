@@ -8,7 +8,7 @@ const NAV_SECTIONS = [
       { label: "Things to Do", href: "/things-to-do" },
       { label: "Services", href: "/services" },
       { label: "Coupons", href: "/coupons" },
-      { label: "News", href: "/announcements" },
+      { label: "Catch us", href: "/announcements" },
     ],
   },
   {
