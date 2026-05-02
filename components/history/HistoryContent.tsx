@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useScroll, useSpring, useTransform } from "framer-motion";
 import { useRef } from "react";
 
 interface PageContent {
@@ -197,6 +197,108 @@ function FadeInUp({
   );
 }
 
+function TimelineSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start 85%", "end 25%"],
+  });
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 60, damping: 18 });
+  const lineScaleY = useTransform(smoothProgress, [0, 1], [0, 1]);
+
+  return (
+    <div className="relative z-10 max-w-7xl mx-auto px-4 pb-20">
+      <FadeInUp className="mb-10">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="h-[2px] w-8 bg-accent" />
+          <span className="text-xs font-bold tracking-[0.2em] uppercase text-accent">
+            Key Milestones
+          </span>
+        </div>
+        <h2
+          className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight"
+          style={{ fontFamily: "'Outfit', sans-serif" }}
+        >
+          Columbus Through the{" "}
+          <span style={{ color: "var(--accent)" }}>Ages</span>
+        </h2>
+      </FadeInUp>
+
+      <div ref={containerRef} className="relative">
+        {/* Gray track — always visible */}
+        <div className="absolute left-5 md:left-1/2 top-0 bottom-0 w-px bg-gray-200/80 transform md:-translate-x-px" />
+
+        {/* Gold animated fill — grows top→bottom as you scroll */}
+        <div className="absolute left-5 md:left-1/2 top-0 bottom-0 w-px transform md:-translate-x-px overflow-hidden">
+          <motion.div
+            className="w-full h-full"
+            style={{
+              scaleY: lineScaleY,
+              transformOrigin: "top",
+              background: "linear-gradient(to bottom, var(--accent), oklch(0.75 0.18 80 / 0.5))",
+            }}
+          />
+        </div>
+
+        <div className="space-y-8 md:space-y-12">
+          {TIMELINE.map((item, i) => (
+            <motion.div
+              key={item.year}
+              initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+              className={`relative flex gap-6 ${
+                i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+              } items-start`}
+            >
+              {/* Animated dot with pulse ring */}
+              <motion.div
+                className="absolute left-5 md:left-1/2 -translate-x-1/2 z-10 mt-3"
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ type: "spring", stiffness: 280, damping: 18, delay: 0.15 }}
+              >
+                {/* Pulse ring */}
+                <motion.span
+                  className="absolute rounded-full"
+                  style={{
+                    inset: "-6px",
+                    background: "rgba(245,168,0,0.22)",
+                  }}
+                  initial={{ scale: 0, opacity: 0 }}
+                  whileInView={{ scale: [0, 1.6, 1], opacity: [0, 1, 0] }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.35, duration: 0.7, ease: "easeOut" }}
+                />
+                {/* Dot */}
+                <span className="block w-5 h-5 rounded-full bg-accent border-[3px] border-white shadow-lg shadow-amber-400/50" />
+              </motion.div>
+
+              {/* Card */}
+              <div
+                className={`ml-14 md:ml-0 md:w-[46%] bg-white/60 backdrop-blur-sm border border-white/80 rounded-2xl shadow-lg shadow-gray-200/60 p-5 hover:shadow-xl hover:shadow-gray-300/60 transition-all duration-300 ${
+                  i % 2 === 0 ? "md:mr-auto" : "md:ml-auto"
+                }`}
+              >
+                <span
+                  className="text-xs font-black tracking-[0.15em] uppercase mb-1 block"
+                  style={{ color: "var(--accent)" }}
+                >
+                  {item.year}
+                </span>
+                <h3 className="text-gray-900 font-bold text-base mb-1">{item.event}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{item.detail}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function HistoryContent({ content }: { content: PageContent }) {
   const historyText =
     content.history_text ||
@@ -360,62 +462,7 @@ export default function HistoryContent({ content }: { content: PageContent }) {
         </div>
 
         {/* ── Timeline ─────────────────────────────── */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 pb-20">
-          <FadeInUp className="mb-10">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="h-[2px] w-8 bg-accent" />
-              <span className="text-xs font-bold tracking-[0.2em] uppercase text-accent">
-                Key Milestones
-              </span>
-            </div>
-            <h2
-              className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight"
-              style={{ fontFamily: "'Outfit', sans-serif" }}
-            >
-              Columbus Through the{" "}
-              <span style={{ color: "var(--accent)" }}>Ages</span>
-            </h2>
-          </FadeInUp>
-
-          <div className="relative">
-            {/* Vertical line */}
-            <div className="absolute left-5 md:left-1/2 top-0 bottom-0 w-px bg-gray-200 transform md:-translate-x-px" />
-
-            <div className="space-y-6">
-              {TIMELINE.map((item, i) => (
-                <motion.div
-                  key={item.year}
-                  initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ delay: i * 0.07, duration: 0.5 }}
-                  className={`relative flex gap-6 ${
-                    i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                  } items-start`}
-                >
-                  {/* Dot */}
-                  <div className="absolute left-5 md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-accent border-2 border-white shadow-md shadow-amber-300/40 mt-3 z-10" />
-
-                  {/* Card */}
-                  <div
-                    className={`ml-14 md:ml-0 md:w-[46%] bg-white/60 backdrop-blur-sm border border-white/80 rounded-2xl shadow-lg shadow-gray-200/60 p-5 hover:shadow-xl hover:shadow-gray-300/60 transition-all duration-300 ${
-                      i % 2 === 0 ? "md:mr-auto" : "md:ml-auto"
-                    }`}
-                  >
-                    <span
-                      className="text-xs font-black tracking-[0.15em] uppercase mb-1 block"
-                      style={{ color: "var(--accent)" }}
-                    >
-                      {item.year}
-                    </span>
-                    <h3 className="text-gray-900 font-bold text-base mb-1">{item.event}</h3>
-                    <p className="text-gray-500 text-sm leading-relaxed">{item.detail}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <TimelineSection />
 
         {/* ── Achievements ─────────────────────────── */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 pb-20">
