@@ -52,7 +52,7 @@ export default function CouponsContent({
               className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
                 isActive
                   ? "bg-accent text-[#020C1B] shadow-lg shadow-amber-500/20"
-                  : "bg-white/8 border border-white/10 text-white/70 hover:bg-white/[0.12] hover:text-white"
+                  : "bg-white border border-gray-200 text-gray-600 hover:border-accent/40 hover:text-gray-900"
               }`}
             >
               {label}
@@ -66,8 +66,8 @@ export default function CouponsContent({
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-40 gap-4 text-center">
           <div className="text-6xl opacity-30">🏷️</div>
-          <p className="text-white/50 font-semibold text-xl">No coupons found.</p>
-          <p className="text-white/30 text-sm">
+          <p className="text-gray-500 font-semibold text-xl">No coupons found.</p>
+          <p className="text-gray-400 text-sm">
             {activeSlug === "all"
               ? "Check back soon — new coupons are added regularly."
               : "No coupons in this category yet."}

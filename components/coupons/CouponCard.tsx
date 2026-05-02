@@ -43,7 +43,7 @@ export function CouponCopyBox({ code, large = false, onCopy }: { code: string; l
   const [copied, setCopied] = useState(false);
 
   return (
-    <div className={`flex items-center gap-3 bg-white/5 border border-dashed border-accent/40 rounded-2xl ${large ? "px-5 py-4" : "px-3 py-2.5"}`}>
+    <div className={`flex items-center gap-3 bg-amber-50 border border-dashed border-accent/50 rounded-2xl ${large ? "px-5 py-4" : "px-3 py-2.5"}`}>
       <span className={`text-accent font-mono font-black flex-1 tracking-widest truncate ${large ? "text-2xl" : "text-sm"}`}>
         {code}
       </span>
@@ -80,7 +80,7 @@ export default function CouponCard({ coupon, index }: { coupon: Coupon; index: n
       transition={{ type: "spring", stiffness: 300, damping: 22 }}
     >
       <Link href={`/coupons/${coupon.id}`} className="group block">
-        <div className="bg-white/8 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden hover:border-white/25 hover:bg-white/[0.12] hover:shadow-2xl hover:shadow-black/30 transition-all duration-500">
+        <div className="bg-white border border-gray-100 rounded-3xl overflow-hidden hover:border-accent/30 hover:shadow-2xl hover:shadow-gray-200/80 transition-all duration-500">
 
           {/* Visual panel */}
           <div className="relative w-full h-48">
@@ -99,7 +99,7 @@ export default function CouponCard({ coupon, index }: { coupon: Coupon; index: n
               </div>
             )}
             {/* Gradient fade to card body */}
-            <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[#0a0e1a] to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white to-transparent" />
 
             {/* Category badge */}
             {coupon.coupon_categories?.name && (
@@ -120,7 +120,7 @@ export default function CouponCard({ coupon, index }: { coupon: Coupon; index: n
           {/* Card body */}
           <div className="p-5 flex flex-col h-full flex-1">
             <h3
-              className="text-base font-black text-white mb-1 leading-snug line-clamp-1 group-hover:text-accent transition-colors duration-300 flex items-center gap-2"
+              className="text-base font-black text-gray-900 mb-1 leading-snug line-clamp-1 group-hover:text-accent transition-colors duration-300 flex items-center gap-2"
               style={{ fontFamily: "'Outfit', sans-serif" }}
             >
               {coupon.is_premium && (
@@ -130,7 +130,7 @@ export default function CouponCard({ coupon, index }: { coupon: Coupon; index: n
             </h3>
 
             {coupon.description && (
-              <p className="text-white/50 text-sm line-clamp-2 mb-4 leading-relaxed">
+              <p className="text-gray-500 text-sm line-clamp-2 mb-4 leading-relaxed">
                 {coupon.description}
               </p>
             )}
@@ -141,7 +141,7 @@ export default function CouponCard({ coupon, index }: { coupon: Coupon; index: n
                 <CouponCopyBox code={coupon.coupon_code} />
               </div>
             ) : (
-              <span className="inline-block self-start text-[11px] font-bold px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/70">
+              <span className="inline-block self-start text-[11px] font-bold px-3 py-1.5 rounded-full bg-gray-100 border border-gray-200 text-gray-600">
                 Mention Catch Columbus
               </span>
             )}
