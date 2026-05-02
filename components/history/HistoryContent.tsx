@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useInView, useScroll, useSpring, useTransform } from "framer-motion";
 import { useRef } from "react";
 
@@ -12,6 +13,14 @@ interface PageContent {
   achievements_title: string;
   achievements: string[];
 }
+
+// ── Image URLs ───────────────────────────────────────────────────────────────
+// Replace any of these with your Supabase public URLs once uploaded.
+// Format: https://<project>.supabase.co/storage/v1/object/public/city-images/history/<file>
+const HISTORY_IMAGES = {
+  heroBanner:    "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1400&q=80",
+  foundingStory: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80",
+};
 
 const STATS = [
   { value: "1812", label: "Year Founded" },
@@ -76,50 +85,58 @@ const TIMELINE = [
 const NEIGHBORHOODS = [
   {
     name: "Short North",
-    description: "The vibrant arts and entertainment district — home to galleries, independent restaurants, boutiques, and nightlife along High Street.",
-    color: "from-purple-900 to-primary",
+    description: "The vibrant arts and entertainment district — galleries, independent restaurants, boutiques, and nightlife along High Street.",
+    // Replace with: city-images/history/short-north.webp
+    image: "https://images.unsplash.com/photo-1555817128-342b3f6b6b62?w=600&q=80",
     icon: "🎨",
   },
   {
     name: "German Village",
     description: "A National Historic Landmark featuring 19th-century brick homes, cobblestone streets, and the legendary Book Loft.",
-    color: "from-amber-900 to-primary",
+    // Replace with: city-images/history/german-village.webp
+    image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&q=80",
     icon: "🏘️",
   },
   {
     name: "Downtown",
     description: "Columbus's commercial, cultural, and civic core — home to the Arena District, Columbus Commons, and major employers.",
-    color: "from-primary to-blue-900",
+    // Replace with: city-images/history/downtown.webp
+    image: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600&q=80",
     icon: "🏙️",
   },
   {
     name: "Franklinton",
     description: "The birthplace of Columbus, now reborn as the 'Franklinton Arts District' with murals, studios, and creative spaces.",
-    color: "from-teal-900 to-primary",
+    // Replace with: city-images/history/franklinton.webp
+    image: "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=600&q=80",
     icon: "🎭",
   },
   {
     name: "Clintonville",
     description: "A beloved eclectic neighborhood known for independent shops, community gardens, and the Whetstone Park of Roses.",
-    color: "from-green-900 to-primary",
+    // Replace with: city-images/history/clintonville.webp
+    image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80",
     icon: "🌳",
   },
   {
     name: "Victorian Village",
     description: "Stunning late 19th-century architecture surrounding Goodale Park — the city's oldest public park, established in 1851.",
-    color: "from-rose-900 to-primary",
+    // Replace with: city-images/history/victorian-village.webp
+    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&q=80",
     icon: "🏛️",
   },
   {
     name: "Italian Village",
     description: "Once home to Italian immigrants, now a trendy district of renovated row houses, wine bars, and artisan coffee shops.",
-    color: "from-orange-900 to-primary",
+    // Replace with: city-images/history/italian-village.webp
+    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80",
     icon: "🍷",
   },
   {
     name: "Arena District",
     description: "The modern entertainment hub built around Nationwide Arena — home to NHL's Columbus Blue Jackets and Huntington Park.",
-    color: "from-indigo-900 to-primary",
+    // Replace with: city-images/history/arena-district.webp
+    image: "https://images.unsplash.com/photo-1540747913346-19c54e45b8db?w=600&q=80",
     icon: "🏒",
   },
 ];
@@ -395,6 +412,38 @@ export default function HistoryContent({ content }: { content: PageContent }) {
           </p>
         </div>
 
+        {/* ── Hero Image Banner ─────────────────────── */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 pb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+            className="relative h-64 md:h-[380px] rounded-3xl overflow-hidden shadow-2xl shadow-gray-300/50"
+          >
+            <Image
+              src={HISTORY_IMAGES.heroBanner}
+              alt="Columbus, Ohio city skyline"
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
+            <div className="absolute bottom-7 left-8">
+              <span className="text-accent text-xs font-black tracking-[0.2em] uppercase block mb-1">
+                Est. 1812
+              </span>
+              <p
+                className="text-white text-3xl md:text-4xl font-black leading-tight"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
+                Columbus, Ohio
+              </p>
+              <p className="text-white/60 text-sm mt-1">Ohio&apos;s capital &amp; largest city</p>
+            </div>
+          </motion.div>
+        </div>
+
         {/* ── Stats Bar ─────────────────────────────── */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 pb-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -420,42 +469,57 @@ export default function HistoryContent({ content }: { content: PageContent }) {
 
         {/* ── Founding Story ────────────────────────── */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 pb-20">
-          <FadeInUp className="bg-white/60 backdrop-blur-sm border border-white/80 rounded-3xl shadow-lg shadow-gray-200/60 p-8 md:p-12">
-            <div className="flex items-center gap-3 mb-5">
-              <span className="h-[2px] w-8 bg-accent" />
-              <span className="text-xs font-bold tracking-[0.2em] uppercase text-accent">
-                Our Story
-              </span>
-            </div>
-            <h2
-              className="text-3xl md:text-4xl font-black text-gray-900 mb-5 tracking-tight"
-              style={{ fontFamily: "'Outfit', sans-serif" }}
-            >
-              A City Born by Design
-            </h2>
-            <div className="grid md:grid-cols-2 gap-8 text-gray-600 text-lg leading-relaxed">
-              <div>
-                <p className="mb-4">{historyText}</p>
-                <p>
-                  The establishment of Ohio State University in 1870 anchored Columbus as an
-                  intellectual and cultural capital. By the 20th century, the city had become
-                  a national testing ground for consumer trends, earning the nickname
-                  "America's test market city."
-                </p>
+          <FadeInUp className="bg-white/60 backdrop-blur-sm border border-white/80 rounded-3xl shadow-lg shadow-gray-200/60 overflow-hidden">
+            <div className="grid md:grid-cols-2 gap-0">
+              {/* Text side */}
+              <div className="p-8 md:p-12">
+                <div className="flex items-center gap-3 mb-5">
+                  <span className="h-[2px] w-8 bg-accent" />
+                  <span className="text-xs font-bold tracking-[0.2em] uppercase text-accent">
+                    Our Story
+                  </span>
+                </div>
+                <h2
+                  className="text-3xl md:text-4xl font-black text-gray-900 mb-5 tracking-tight"
+                  style={{ fontFamily: "'Outfit', sans-serif" }}
+                >
+                  A City Born by Design
+                </h2>
+                <div className="space-y-4 text-gray-600 leading-relaxed">
+                  <p>{historyText}</p>
+                  <p>
+                    The establishment of Ohio State University in 1870 anchored Columbus as an
+                    intellectual and cultural capital. By the 20th century, the city had become
+                    a national testing ground for consumer trends, earning the nickname
+                    &ldquo;America&apos;s test market city.&rdquo;
+                  </p>
+                  <p>
+                    The 1913 Great Flood devastated the low-lying Franklinton district, prompting
+                    major flood-control infrastructure and reshaping Columbus&apos;s relationship
+                    with the Scioto River — later transformed into the Scioto Mile greenway.
+                  </p>
+                  <p>
+                    Today, Columbus thrives as Ohio&apos;s economic engine — a hub for technology,
+                    healthcare, finance, and higher education, welcoming tens of thousands of new
+                    residents each year.
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="mb-4">
-                  The 1913 Great Flood, which devastated the low-lying Franklinton district,
-                  prompted major flood-control infrastructure and reshaped Columbus's
-                  relationship with the Scioto River. Decades later, the river would become a
-                  centerpiece of downtown revitalization through the Scioto Mile project.
-                </p>
-                <p>
-                  Today, Columbus thrives as Ohio's economic engine — a hub for technology,
-                  healthcare, finance, and higher education, welcoming tens of thousands of
-                  new residents each year with its affordable cost of living, world-class
-                  universities, and welcoming community.
-                </p>
+
+              {/* Image side */}
+              <div className="relative min-h-[300px] md:min-h-full">
+                <Image
+                  src={HISTORY_IMAGES.foundingStory}
+                  alt="Ohio Statehouse, Columbus — seat of Ohio government since 1816"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-black/10 to-black/20" />
+                <div className="absolute bottom-5 right-5">
+                  <span className="bg-black/50 backdrop-blur-sm text-white/80 text-xs font-semibold px-3 py-1.5 rounded-xl">
+                    Ohio Statehouse · Est. 1816
+                  </span>
+                </div>
               </div>
             </div>
           </FadeInUp>
@@ -535,12 +599,37 @@ export default function HistoryContent({ content }: { content: PageContent }) {
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ delay: i * 0.08, duration: 0.5 }}
                 whileHover={{ y: -6 }}
-                className={`relative bg-gradient-to-br ${n.color} rounded-3xl p-6 text-white overflow-hidden cursor-default shadow-md hover:shadow-xl transition-all duration-300`}
+                className="group relative rounded-3xl overflow-hidden cursor-default shadow-lg hover:shadow-2xl hover:shadow-gray-300/60 transition-all duration-500"
               >
-                <div className="text-4xl mb-3">{n.icon}</div>
-                <h3 className="text-lg font-bold mb-2">{n.name}</h3>
-                <p className="text-white/75 text-sm leading-relaxed">{n.description}</p>
-                <div className="absolute -bottom-6 -right-6 w-24 h-24 rounded-full bg-white/5" />
+                {/* Photo */}
+                <div className="relative h-64">
+                  <Image
+                    src={n.image}
+                    alt={`${n.name} neighborhood, Columbus Ohio`}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  {/* Dark gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/5" />
+                </div>
+
+                {/* Text overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xl leading-none">{n.icon}</span>
+                    <h3 className="text-base font-bold">{n.name}</h3>
+                  </div>
+                  <p className="text-white/65 text-xs leading-relaxed line-clamp-2">
+                    {n.description}
+                  </p>
+                </div>
+
+                {/* Accent top-right badge */}
+                <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-accent/90 backdrop-blur-sm flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <svg width="14" height="14" fill="none" stroke="#020C1B" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                  </svg>
+                </div>
               </motion.div>
             ))}
           </div>
