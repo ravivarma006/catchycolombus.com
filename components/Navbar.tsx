@@ -8,7 +8,7 @@ import { subscribe } from "@/app/subscribe/actions";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
+  { href: "/history", label: "History" },
   { href: "/events", label: "Events" },
   { href: "/things-to-do", label: "Things to Do" },
   { href: "/services", label: "Services" },

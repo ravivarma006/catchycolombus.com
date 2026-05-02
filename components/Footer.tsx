@@ -24,8 +24,8 @@ const NAV_SECTIONS = [
   {
     title: "Company",
     links: [
-      { label: "About Us", href: "/about" },
-      { label: "Contact", href: "/about" },
+      { label: "History", href: "/history" },
+      { label: "Contact", href: "/history" },
       { label: "Sign In", href: "/auth/login" },
       { label: "Sign Up", href: "/auth/signup" },
     ],
