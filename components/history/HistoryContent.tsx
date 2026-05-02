@@ -18,8 +18,10 @@ interface PageContent {
 // Replace any of these with your Supabase public URLs once uploaded.
 // Format: https://<project>.supabase.co/storage/v1/object/public/city-images/history/<file>
 const HISTORY_IMAGES = {
-  heroBanner:    "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1400&q=80",
-  foundingStory: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80",
+  // Columbus skyline from Main Street Bridge — Jordan Griffith / Unsplash
+  heroBanner:    "https://images.unsplash.com/photo-1654115480560-67642e776a30?w=1400&q=80&auto=format&fit=crop",
+  // Columbus high-rise buildings + bridge at daytime — Oz Seyrek / Unsplash
+  foundingStory: "https://images.unsplash.com/photo-1578455451341-4abd1a00567e?w=900&q=80&auto=format&fit=crop",
 };
 
 const STATS = [
@@ -86,57 +88,57 @@ const NEIGHBORHOODS = [
   {
     name: "Short North",
     description: "The vibrant arts and entertainment district — galleries, independent restaurants, boutiques, and nightlife along High Street.",
-    // Replace with: city-images/history/short-north.webp
-    image: "https://images.unsplash.com/photo-1555817128-342b3f6b6b62?w=600&q=80",
+    // Columbus, OH brick street with fairy lights — Connor Gan / Unsplash
+    image: "https://images.unsplash.com/photo-1717802658947-4ec14ff8daef?w=600&q=80&auto=format&fit=crop",
     icon: "🎨",
   },
   {
     name: "German Village",
     description: "A National Historic Landmark featuring 19th-century brick homes, cobblestone streets, and the legendary Book Loft.",
-    // Replace with: city-images/history/german-village.webp
-    image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&q=80",
+    // Aerial Columbus with canopy of trees, German Village area — Unsplash
+    image: "https://images.unsplash.com/photo-1635717644991-76d692912140?w=600&q=80&auto=format&fit=crop",
     icon: "🏘️",
   },
   {
     name: "Downtown",
     description: "Columbus's commercial, cultural, and civic core — home to the Arena District, Columbus Commons, and major employers.",
-    // Replace with: city-images/history/downtown.webp
-    image: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600&q=80",
+    // Columbus skyline at dusk, purple sky — Unsplash
+    image: "https://images.unsplash.com/photo-1721269592869-31f51014236b?w=600&q=80&auto=format&fit=crop",
     icon: "🏙️",
   },
   {
     name: "Franklinton",
     description: "The birthplace of Columbus, now reborn as the 'Franklinton Arts District' with murals, studios, and creative spaces.",
-    // Replace with: city-images/history/franklinton.webp
-    image: "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=600&q=80",
+    // Colorful graffiti mural alley — James Garman / Unsplash
+    image: "https://images.unsplash.com/photo-1530406831759-15c5c0cbce8b?w=600&q=80&auto=format&fit=crop",
     icon: "🎭",
   },
   {
     name: "Clintonville",
     description: "A beloved eclectic neighborhood known for independent shops, community gardens, and the Whetstone Park of Roses.",
-    // Replace with: city-images/history/clintonville.webp
-    image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80",
+    // Rose garden path — Naoki Suzuki / Unsplash
+    image: "https://images.unsplash.com/photo-1747557219169-1329643031cf?w=600&q=80&auto=format&fit=crop",
     icon: "🌳",
   },
   {
     name: "Victorian Village",
     description: "Stunning late 19th-century architecture surrounding Goodale Park — the city's oldest public park, established in 1851.",
-    // Replace with: city-images/history/victorian-village.webp
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&q=80",
+    // Victorian house with lampposts — Unsplash
+    image: "https://images.unsplash.com/photo-1576525390218-1f9f706684cf?w=600&q=80&auto=format&fit=crop",
     icon: "🏛️",
   },
   {
     name: "Italian Village",
     description: "Once home to Italian immigrants, now a trendy district of renovated row houses, wine bars, and artisan coffee shops.",
-    // Replace with: city-images/history/italian-village.webp
-    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80",
+    // Outdoor café dining, sunny street — Johan Mouchet / Unsplash
+    image: "https://images.unsplash.com/photo-1759050475187-674550fa911e?w=600&q=80&auto=format&fit=crop",
     icon: "🍷",
   },
   {
     name: "Arena District",
     description: "The modern entertainment hub built around Nationwide Arena — home to NHL's Columbus Blue Jackets and Huntington Park.",
-    // Replace with: city-images/history/arena-district.webp
-    image: "https://images.unsplash.com/photo-1540747913346-19c54e45b8db?w=600&q=80",
+    // Aerial stadium view — Unsplash
+    image: "https://images.unsplash.com/photo-1751894537049-297f37050992?w=600&q=80&auto=format&fit=crop",
     icon: "🏒",
   },
 ];
