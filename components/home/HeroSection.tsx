@@ -481,49 +481,6 @@ export default function HeroSection({ slides, stats, deals = [] }: HeroSectionPr
             ))}
           </motion.div>
 
-          {/* Thumbnail navigation */}
-          <motion.div
-            className="flex items-center gap-2.5"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0, transition: { delay: 0.6, duration: 0.7 } }}
-          >
-            {slides.map((s, i) => (
-              <button
-                key={i}
-                id={`hero-thumb-${i}`}
-                onClick={() => goTo(i)}
-                aria-label={`Go to ${s.location}`}
-                className="relative rounded-xl overflow-hidden transition-all duration-300 focus:outline-none"
-                style={{
-                  width: i === active ? 72 : 48,
-                  height: i === active ? 52 : 36,
-                  opacity: i === active ? 1 : 0.45,
-                  boxShadow: i === active
-                    ? `0 0 0 2px ${"var(--accent)"}, 0 4px 16px rgba(0,0,0,0.4)`
-                    : "none",
-                }}
-              >
-                <Image
-                  src={s.thumb}
-                  alt={s.location}
-                  fill
-                  className="object-cover"
-                  sizes="80px"
-                />
-                {/* active slide progress sweep */}
-                {i === active && (
-                  <motion.div
-                    key={`sw-${active}-${phase}`}
-                    className="absolute bottom-0 left-0 h-[3px]"
-                    style={{ backgroundColor: "var(--accent)" }}
-                    initial={{ width: "0%" }}
-                    animate={{ width: "100%" }}
-                    transition={{ duration: cycleSec, ease: "linear" }}
-                  />
-                )}
-              </button>
-            ))}
-          </motion.div>
         </div>
       </div>
 

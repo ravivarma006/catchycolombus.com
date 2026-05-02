@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
+import CopyLinkButton from "@/components/refer/CopyLinkButton";
 
 export const metadata: Metadata = { title: "Refer Friends & Earn Premium" };
 
@@ -86,17 +87,7 @@ export default async function ReferPage() {
         {/* Link Share Card */}
         <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md max-w-2xl mx-auto">
           <h2 className="text-lg font-bold text-white mb-4">Share your unique link</h2>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <input 
-              readOnly 
-              value={shareLink}
-              className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-yellow-100 font-mono focus:outline-none"
-            />
-            {/* Note: the copy logic requires client-component wrapper in real prod, but left as visual for SSR */}
-            <button className="bg-yellow-400 hover:bg-yellow-300 text-[#020C1B] font-bold px-6 py-3 rounded-xl transition shadow-lg shadow-yellow-500/20 shrink-0">
-              Copy Link
-            </button>
-          </div>
+          <CopyLinkButton shareLink={shareLink} />
 
           <div className="flex gap-4 justify-center mt-6">
             <a href={`https://twitter.com/intent/tweet?text=Find the best Columbus deals!&url=${encodeURIComponent(shareLink)}`} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#1DA1F2] hover:text-white transition">

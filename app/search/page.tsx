@@ -15,7 +15,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const query = (searchParams.q || "").trim();
   const supabase = createClient();
 
-  type EventResult = { id: string; event_name: string; address: string | null; event_date: string | null; image_url: string | null; slug: string };
+  type EventResult = { id: string; title: string; location: string | null; event_date: string | null; image_url: string | null; slug: string };
   type ProviderResult = { id: string; business_name: string; address: string | null; image_url: string | null; slug: string; service_categories: { name: string; slug: string } | null };
   type CouponResult = { id: string; product_service_name: string; description: string | null; coupon_code: string | null; image_url: string | null };
   type ActivityResult = { id: string; name: string; short_description: string | null; image_url: string | null; slug: string; activity_categories: { name: string; slug: string } | null };
@@ -29,9 +29,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     const [eventsRes, providersRes, couponsRes, activitiesRes] = await Promise.all([
       supabase
         .from("events")
-        .select("id, event_name, address, event_date, image_url, slug")
+        .select("id, title, location, event_date, image_url, slug")
         .eq("is_active", true)
-        .ilike("event_name", `%${query}%`)
+        .ilike("title", `%${query}%`)
         .limit(6),
 
       supabase
@@ -147,8 +147,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 key={e.id}
                 href={`/events/${e.slug}`}
                 image={e.image_url}
-                title={e.event_name}
-                subtitle={[e.address, e.event_date ? new Date(e.event_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : null].filter(Boolean).join(" · ")}
+                title={e.title}
+                subtitle={[e.location, e.event_date ? new Date(e.event_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : null].filter(Boolean).join(" · ")}
                 tag="Event"
                 tagColor="bg-blue-500/20 text-blue-300"
               />
