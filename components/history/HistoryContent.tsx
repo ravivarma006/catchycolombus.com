@@ -254,9 +254,9 @@ function TimelineSection() {
             >
               {/* Animated dot with pulse ring */}
               <motion.div
-                className="absolute left-5 md:left-1/2 -translate-x-1/2 z-10 mt-3"
-                initial={{ scale: 0, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
+                className="absolute left-5 md:left-1/2 z-10 mt-3"
+                initial={{ scale: 0, opacity: 0, x: "-50%" }}
+                whileInView={{ scale: 1, opacity: 1, x: "-50%" }}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ type: "spring", stiffness: 280, damping: 18, delay: 0.15 }}
               >
