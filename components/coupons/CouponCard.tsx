@@ -98,8 +98,7 @@ export default function CouponCard({ coupon, index }: { coupon: Coupon; index: n
                 <div className="absolute inset-0 bg-white/5" />
               </div>
             )}
-            {/* Gradient fade to card body */}
-            <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white to-transparent" />
+
 
             {/* Category badge */}
             {coupon.coupon_categories?.name && (
