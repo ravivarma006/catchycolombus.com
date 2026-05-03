@@ -2,6 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import {
+  sendEmail,
+  getAdminEmail,
+  adminNewListingHtml,
+  adminResubmittedHtml,
+  businessApprovedHtml,
+  businessNeedsChangesHtml,
+  businessRejectedHtml,
+} from "@/lib/email";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://catchcolumbus.com";
 
 // ─────────────────────────────────────────
 // Guard: ensure caller is an admin
@@ -75,6 +86,14 @@ export async function rejectRequest(
       ? "provider_requests"
       : "coupon_requests";
 
+  // Fetch listing details for the notification email BEFORE updating
+  const { data: reqData } = await supabase.from(table).select("*").eq("id", id).single();
+  const listingEmail: string | null = reqData?.email ?? null;
+  const listingName: string =
+    type === "event"    ? (reqData?.event_name            ?? "Event") :
+    type === "provider" ? (reqData?.business_name         ?? "Business") :
+                          (reqData?.product_service_name  ?? "Coupon");
+
   const { error } = await supabase
     .from(table)
     .update({
@@ -87,6 +106,15 @@ export async function rejectRequest(
   if (error) {
     console.error("[rejectRequest]", error.message);
     return { error: "Could not reject request." };
+  }
+
+  // ── Notify business user ──────────────────────────────────
+  if (listingEmail) {
+    sendEmail({
+      to: listingEmail,
+      subject: `Your ${type === "event" ? "Event" : type === "provider" ? "Business Listing" : "Coupon"} Was Not Approved — Catch Columbus`,
+      html: businessRejectedHtml({ type, listingName, adminNotes: adminNotes.trim() }),
+    }).catch((err) => console.error("[rejectRequest] email failed:", err));
   }
 
   revalidatePath("/admin");
@@ -116,6 +144,14 @@ export async function requestChanges(
       ? "provider_requests"
       : "coupon_requests";
 
+  // Fetch listing details for the notification email BEFORE updating
+  const { data: reqData } = await supabase.from(table).select("*").eq("id", id).single();
+  const listingEmail: string | null = reqData?.email ?? null;
+  const listingName: string =
+    type === "event"    ? (reqData?.event_name            ?? "Event") :
+    type === "provider" ? (reqData?.business_name         ?? "Business") :
+                          (reqData?.product_service_name  ?? "Coupon");
+
   const { error } = await supabase
     .from(table)
     .update({
@@ -128,6 +164,20 @@ export async function requestChanges(
   if (error) {
     console.error("[requestChanges]", error.message);
     return { error: "Could not update request." };
+  }
+
+  // ── Notify business user ──────────────────────────────────
+  if (listingEmail) {
+    sendEmail({
+      to: listingEmail,
+      subject: `Changes Needed for Your ${type === "event" ? "Event" : type === "provider" ? "Business Listing" : "Coupon"} — Catch Columbus`,
+      html: businessNeedsChangesHtml({
+        type,
+        listingName,
+        adminNotes: adminNotes.trim(),
+        dashboardUrl: `${SITE_URL}/dashboard/submissions`,
+      }),
+    }).catch((err) => console.error("[requestChanges] email failed:", err));
   }
 
   revalidatePath("/admin");
@@ -182,6 +232,19 @@ export async function approveEventRequest(
     .update({ status: "approved", admin_notes: null, updated_at: new Date().toISOString() })
     .eq("id", id);
 
+  // ── Notify business user ──────────────────────────────────
+  if (req.email) {
+    sendEmail({
+      to: req.email,
+      subject: "Your Event Is Approved — Catch Columbus",
+      html: businessApprovedHtml({
+        type: "event",
+        listingName: req.event_name,
+        liveUrl: `${SITE_URL}/events/${slug}`,
+      }),
+    }).catch((err) => console.error("[approveEventRequest] email failed:", err));
+  }
+
   revalidatePath("/admin");
   revalidatePath("/admin/events");
   revalidatePath("/events");
@@ -233,6 +296,19 @@ export async function approveProviderRequest(
     .update({ status: "approved", admin_notes: null, updated_at: new Date().toISOString() })
     .eq("id", id);
 
+  // ── Notify business user ──────────────────────────────────
+  if (req.email) {
+    sendEmail({
+      to: req.email,
+      subject: "Your Business Listing Is Approved — Catch Columbus",
+      html: businessApprovedHtml({
+        type: "provider",
+        listingName: req.business_name,
+        liveUrl: `${SITE_URL}/services`,
+      }),
+    }).catch((err) => console.error("[approveProviderRequest] email failed:", err));
+  }
+
   revalidatePath("/admin");
   revalidatePath("/admin/services");
   revalidatePath("/services");
@@ -280,6 +356,19 @@ export async function approveCouponRequest(
     .from("coupon_requests")
     .update({ status: "approved", admin_notes: null, updated_at: new Date().toISOString() })
     .eq("id", id);
+
+  // ── Notify business user ──────────────────────────────────
+  if (req.email) {
+    sendEmail({
+      to: req.email,
+      subject: "Your Coupon Is Approved — Catch Columbus",
+      html: businessApprovedHtml({
+        type: "coupon",
+        listingName: req.product_service_name,
+        liveUrl: `${SITE_URL}/coupons`,
+      }),
+    }).catch((err) => console.error("[approveCouponRequest] email failed:", err));
+  }
 
   revalidatePath("/admin");
   revalidatePath("/admin/coupons");

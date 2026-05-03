@@ -3,6 +3,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { providerRequestSchema, formatZodErrors } from "@/lib/validations";
+import { sendEmail, getAdminEmail, adminNewListingHtml, adminResubmittedHtml } from "@/lib/email";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://catchcolumbus.com";
 
 export async function submitProviderRequest(
   _prev: { error: string },
@@ -98,6 +101,23 @@ export async function submitProviderRequest(
       return { error: "Could not save your changes. Please try again." };
     }
 
+    // ── Notify admin when business user resubmits after needs_changes ──
+    if (existing.status === "needs_changes") {
+      const adminEmail = getAdminEmail();
+      if (adminEmail) {
+        sendEmail({
+          to: adminEmail,
+          subject: `Business Listing Resubmitted — ${data.business_name}`,
+          html: adminResubmittedHtml({
+            type: "provider",
+            listingName: data.business_name,
+            submitterEmail: data.email,
+            adminPanelUrl: `${SITE_URL}/admin/services`,
+          }),
+        }).catch((err) => console.error("[submitProviderRequest:resubmit] email failed:", err));
+      }
+    }
+
     redirect("/dashboard/submissions?updated=1");
   }
 
@@ -122,6 +142,21 @@ export async function submitProviderRequest(
   if (dbError) {
     console.error("[submitProviderRequest]", dbError.message);
     return { error: "Something went wrong. Please try again." };
+  }
+
+  // ── Notify admin of new submission ────────────────────────
+  const adminEmail = getAdminEmail();
+  if (adminEmail) {
+    sendEmail({
+      to: adminEmail,
+      subject: `New Business Listing Submitted — ${data.business_name}`,
+      html: adminNewListingHtml({
+        type: "provider",
+        listingName: data.business_name,
+        submitterEmail: data.email,
+        adminPanelUrl: `${SITE_URL}/admin/services`,
+      }),
+    }).catch((err) => console.error("[submitProviderRequest] email failed:", err));
   }
 
   redirect("/services/submit?success=1");

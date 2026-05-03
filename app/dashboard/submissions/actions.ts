@@ -2,6 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { sendEmail, getAdminEmail, adminResubmittedHtml } from "@/lib/email";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://catchcolumbus.com";
 
 type RequestType = "event" | "provider" | "coupon";
 
@@ -29,9 +32,10 @@ export async function resubmitRequest(
       : "coupon_requests";
 
   // Verify ownership and current status before updating
+  // Also fetch name + email columns for the notification email
   const { data: existing, error: fetchError } = await supabase
     .from(table)
-    .select("id, status, user_id")
+    .select("id, status, user_id, email, event_name, business_name, product_service_name")
     .eq("id", id)
     .single();
 
@@ -56,6 +60,26 @@ export async function resubmitRequest(
   if (updateError) {
     console.error("[resubmitRequest]", updateError.message);
     return { error: "Could not resubmit. Please try again." };
+  }
+
+  // ── Notify admin that listing is resubmitted ──────────────
+  const adminEmail = getAdminEmail();
+  if (adminEmail) {
+    const listingName: string =
+      type === "event"    ? (existing.event_name            ?? "Event") :
+      type === "provider" ? (existing.business_name         ?? "Business") :
+                            (existing.product_service_name  ?? "Coupon");
+    const submitterEmail: string = existing.email ?? "";
+    const adminPanelUrl =
+      type === "event"    ? `${SITE_URL}/admin/events` :
+      type === "provider" ? `${SITE_URL}/admin/services` :
+                            `${SITE_URL}/admin/coupons`;
+
+    sendEmail({
+      to: adminEmail,
+      subject: `${type === "event" ? "Event" : type === "provider" ? "Business Listing" : "Coupon"} Resubmitted — ${listingName}`,
+      html: adminResubmittedHtml({ type, listingName, submitterEmail, adminPanelUrl }),
+    }).catch((err) => console.error("[resubmitRequest] email failed:", err));
   }
 
   revalidatePath("/dashboard/submissions");

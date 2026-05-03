@@ -3,6 +3,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { couponRequestSchema, formatZodErrors } from "@/lib/validations";
+import { sendEmail, getAdminEmail, adminNewListingHtml } from "@/lib/email";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://catchcolumbus.com";
 
 export async function submitCouponRequest(
   _prev: { error: string },
@@ -67,6 +70,21 @@ export async function submitCouponRequest(
   if (dbError) {
     console.error("[submitCouponRequest]", dbError.message);
     return { error: "Something went wrong. Please try again." };
+  }
+
+  // ── Notify admin of new submission ────────────────────────
+  const adminEmail = getAdminEmail();
+  if (adminEmail) {
+    sendEmail({
+      to: adminEmail,
+      subject: `New Coupon Submitted — ${data.product_service_name}`,
+      html: adminNewListingHtml({
+        type: "coupon",
+        listingName: data.product_service_name,
+        submitterEmail: data.email,
+        adminPanelUrl: `${SITE_URL}/admin/coupons`,
+      }),
+    }).catch((err) => console.error("[submitCouponRequest] email failed:", err));
   }
 
   redirect("/coupons/submit?success=1");

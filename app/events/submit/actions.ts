@@ -3,6 +3,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { eventRequestSchema, formatZodErrors } from "@/lib/validations";
+import { sendEmail, getAdminEmail, adminNewListingHtml } from "@/lib/email";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://catchcolumbus.com";
 
 export async function submitEventRequest(
   _prev: { error: string },
@@ -69,6 +72,21 @@ export async function submitEventRequest(
   if (dbError) {
     console.error("[submitEventRequest]", dbError.message);
     return { error: "Something went wrong. Please try again." };
+  }
+
+  // ── Notify admin of new submission ────────────────────────
+  const adminEmail = getAdminEmail();
+  if (adminEmail) {
+    sendEmail({
+      to: adminEmail,
+      subject: `New Event Submitted — ${data.event_name}`,
+      html: adminNewListingHtml({
+        type: "event",
+        listingName: data.event_name,
+        submitterEmail: data.email,
+        adminPanelUrl: `${SITE_URL}/admin/events`,
+      }),
+    }).catch((err) => console.error("[submitEventRequest] email failed:", err));
   }
 
   redirect("/events/submit?success=1");
