@@ -13,6 +13,7 @@ const NAV = [
   { href: "/admin/coupons",       label: "Coupons",        icon: "🏷️" },
   { href: "/admin/announcements", label: "Catch us",       icon: "📢" },
   { href: "/admin/subscribers",   label: "Subscribers",    icon: "📧" },
+  { href: "/admin/settings",      label: "Brand Colors",   icon: "🎨" },
 ];
 
 function SidebarContent({

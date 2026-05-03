@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import AccentSwitcher from "@/components/AccentSwitcher";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import StickyDealBar from "@/components/StickyDealBar";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
@@ -71,15 +70,27 @@ export const metadata: Metadata = {
   },
 };
 
+function hexToRgbParts(hex: string): string {
+  const clean = hex.replace("#", "");
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
+  return `${r} ${g} ${b}`;
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [
+    { data: { user } },
+    { data: siteSettings },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase.from("site_settings").select("primary_color, accent_color").eq("id", 1).single(),
+  ]);
 
   let profile = null;
   if (user) {
@@ -95,9 +106,24 @@ export default async function RootLayout({
     ? { email: user.email, role: profile?.role }
     : null;
 
+  const primaryColor = siteSettings?.primary_color ?? "#0F4C5C";
+  const accentColor  = siteSettings?.accent_color  ?? "#F5A800";
+  const primaryRgb   = hexToRgbParts(primaryColor);
+  const accentRgb    = hexToRgbParts(accentColor);
+
+  const colorVars = `
+    :root {
+      --primary: ${primaryColor};
+      --primary-rgb: ${primaryRgb};
+      --accent: ${accentColor};
+      --accent-rgb: ${accentRgb};
+    }
+  `.trim();
+
   return (
     <html lang="en">
       <head>
+        <style dangerouslySetInnerHTML={{ __html: colorVars }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -110,7 +136,6 @@ export default async function RootLayout({
         <Navbar user={navUser} />
         <main className={!user ? "pb-16 md:pb-0" : ""}>{children}</main>
         <Footer />
-        <AccentSwitcher />
         {!user && <StickyDealBar />}
         {!user && <ExitIntentPopup />}
         {!user && <MobileBottomNav />}
