@@ -6,6 +6,11 @@ import AnnouncementsSection from "@/components/home/AnnouncementsSection";
 import EventsCalendarSection from "@/components/home/EventsCalendarSection";
 import TrustSection from "@/components/home/TrustSection";
 import BannersSection from "@/components/home/BannersSection";
+import SupportLocalSection from "@/components/home/SupportLocalSection";
+import NeverMissDealsSection from "@/components/home/NeverMissDealsSection";
+import BusinessOwnerSection from "@/components/home/BusinessOwnerSection";
+import FAQSection, { HOMEPAGE_FAQS } from "@/components/home/FAQSection";
+import { faqSchema, jsonLd } from "@/lib/schema";
 import type { FeaturedDeal } from "@/components/home/FeaturedDealsSection";
 
 export default async function Home() {
@@ -135,6 +140,12 @@ export default async function Home() {
 
   return (
     <>
+      {/* JSON-LD: FAQPage powers Google featured snippets + AI answers */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(faqSchema(HOMEPAGE_FAQS)) }}
+      />
+
       <HeroSection
         slides={(heroSlides ?? []).map((row: any, i: number) => ({
           id: i,
@@ -152,12 +163,16 @@ export default async function Home() {
         heroSettings={heroSettings}
       />
       <CategoriesSection />
+      <SupportLocalSection />
       <ThingsToDoSection activities={(featuredActivities ?? []).map((a: any) => ({
         ...a,
         category: Array.isArray(a.category) ? a.category[0] ?? null : a.category ?? null,
       }))} />
+      <NeverMissDealsSection />
       <AnnouncementsSection announcements={announcements ?? []} />
       <EventsCalendarSection />
+      <BusinessOwnerSection />
+      <FAQSection />
       <TrustSection />
       <BannersSection banners={banners ?? []} />
     </>

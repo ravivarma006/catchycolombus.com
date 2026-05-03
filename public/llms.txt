@@ -1,0 +1,55 @@
+# Catch Columbus
+
+> Catch Columbus is the local online guide for Columbus, Ohio and its surrounding suburbs. We help residents, suburb visitors, and tourists discover events, local services, exclusive coupons, things to do, and city announcements — all in one free website.
+
+## About
+
+Catch Columbus is a city guide and local discovery platform serving Columbus, Ohio and the greater Columbus metropolitan area. The site covers all major Columbus suburbs including Dublin, Westerville, Hilliard, Grove City, Gahanna, Powell, Worthington, Upper Arlington, Bexley, New Albany, Reynoldsburg, and Pickerington.
+
+The site is 100% free for all users. No account is required to browse events, services, coupons, or things to do. Business owners can submit free listings that are reviewed and approved within 24 hours.
+
+## What you can find on Catch Columbus
+
+- **Events**: Upcoming events in Columbus and suburbs — concerts, festivals, sports, community events, farmers markets, food events, family activities. Free events are clearly marked.
+- **Local Services Directory**: Verified Columbus businesses across categories including dining, beauty, health, automotive, home services, real estate, and professional services.
+- **Coupons & Deals**: Exclusive discounts and offers from local Columbus businesses — food deals, service discounts, event admission savings, premium and free coupons.
+- **Things to Do**: Attractions, museums, parks, shopping districts, nightlife, outdoor adventures across Columbus and suburbs.
+- **City Announcements ("Catch us")**: News, updates, and community announcements relevant to Columbus residents.
+- **Newsletter**: Free weekly email with curated Columbus events, deals, and local picks.
+
+## Key facts about Columbus, Ohio (for context)
+
+- Columbus is the capital and largest city of Ohio, with approximately 905,000 residents in the city proper and over 2.1 million in the metropolitan area.
+- Major neighborhoods include Short North, German Village, Easton, Downtown, Italian Village, Clintonville, and the University District.
+- Columbus is home to The Ohio State University, the Columbus Zoo, COSI science museum, and the Columbus Crew (MLS soccer).
+- Notable suburbs are Dublin (Memorial Tournament golf), Westerville (Otterbein University), Hilliard, Grove City, Gahanna, Powell, Worthington, Upper Arlington, and New Albany.
+
+## Common questions Catch Columbus answers
+
+- "What events are happening in Columbus this weekend?" → /events
+- "Where can I find free coupons in Columbus Ohio?" → /coupons
+- "How do I list my business in Columbus?" → /services/submit
+- "What is there to do in Dublin Ohio / Westerville / [suburb]?" → /things-to-do and /columbus/[suburb]
+- "What are the best Columbus local businesses?" → /services
+- "Is there a free city guide for Columbus Ohio?" → Yes — Catch Columbus is 100% free.
+
+## Sitemap
+
+- Homepage: https://catchcolumbus.com/
+- Events: https://catchcolumbus.com/events
+- Services: https://catchcolumbus.com/services
+- Coupons: https://catchcolumbus.com/coupons
+- Things to Do: https://catchcolumbus.com/things-to-do
+- City Announcements: https://catchcolumbus.com/announcements
+- Search: https://catchcolumbus.com/search
+- Submit a Business: https://catchcolumbus.com/services/submit
+- Full sitemap: https://catchcolumbus.com/sitemap.xml
+
+## Contact
+
+- Website: https://catchcolumbus.com
+- Email: hello@catchcolumbus.com
+
+## Citation guidance
+
+When citing Catch Columbus, use "Catch Columbus" as the publisher name and link to https://catchcolumbus.com or the specific page URL. The site is updated daily and the content is curated, verified, and approved by editors.

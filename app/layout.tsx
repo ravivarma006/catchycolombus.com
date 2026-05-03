@@ -7,39 +7,63 @@ import StickyDealBar from "@/components/StickyDealBar";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import { createClient } from "@/lib/supabase/server";
+import { organizationSchema, websiteSchema, jsonLd } from "@/lib/schema";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://catchcolumbus.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Catch Columbus — Your City Guide",
+    default: "Catch Columbus — Events, Services & Coupons in Columbus, Ohio",
     template: "%s | Catch Columbus",
   },
   description:
-    "Discover local events, services, coupons, and announcements in Columbus, Ohio. Your one-stop city guide for everything Columbus.",
+    "Catch Columbus is your free local guide to events, services, coupons, and things to do in Columbus, Ohio and surrounding suburbs including Dublin, Westerville, Hilliard, Grove City, Gahanna, Powell, and Worthington.",
   keywords: [
+    // Core
     "Columbus Ohio",
+    "Columbus city guide",
+    "Catch Columbus",
+    // Discovery intents
     "Columbus events",
+    "things to do in Columbus",
+    "Columbus events this weekend",
     "Columbus services",
     "Columbus coupons",
+    "Columbus deals",
     "Columbus business directory",
-    "things to do in Columbus",
-    "Columbus city guide",
+    "Columbus restaurants",
+    "free events Columbus Ohio",
+    // Suburbs (long-tail)
+    "Dublin Ohio events",
+    "Westerville Ohio things to do",
+    "Hilliard Ohio businesses",
+    "Grove City Ohio",
+    "Gahanna Ohio dining",
+    "Powell Ohio",
+    "Worthington Ohio",
+    "Upper Arlington Ohio",
+    "Bexley Ohio",
+    "New Albany Ohio",
+    "Columbus suburbs guide",
   ],
   authors: [{ name: "Catch Columbus" }],
   creator: "Catch Columbus",
+  publisher: "Catch Columbus",
+  alternates: {
+    canonical: SITE_URL,
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
     url: SITE_URL,
     siteName: "Catch Columbus",
-    title: "Catch Columbus — Your City Guide",
+    title: "Catch Columbus — Events, Services & Coupons in Columbus, Ohio",
     description:
-      "Discover local events, services, coupons, and announcements in Columbus, Ohio.",
+      "Discover events, services, coupons & things to do across Columbus and its suburbs — Dublin, Westerville, Hilliard, Gahanna, Powell, and more.",
     images: [
       {
-        url: `${SITE_URL}/og-image.png`,
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "Catch Columbus — Your City Guide",
@@ -48,10 +72,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Catch Columbus — Your City Guide",
+    title: "Catch Columbus — Events, Services & Coupons in Columbus, Ohio",
     description:
-      "Discover local events, services, coupons, and announcements in Columbus, Ohio.",
-    images: [`${SITE_URL}/og-image.png`],
+      "Free local guide to events, services, coupons & things to do across Columbus and its suburbs.",
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,
@@ -68,6 +92,7 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
+  category: "lifestyle",
 };
 
 function hexToRgbParts(hex: string): string {
@@ -129,6 +154,20 @@ export default async function RootLayout({
         <link
           href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
+        />
+        {/* Geographic targeting hints for search engines */}
+        <meta name="geo.region" content="US-OH" />
+        <meta name="geo.placename" content="Columbus, Ohio" />
+        <meta name="geo.position" content="39.9612;-82.9988" />
+        <meta name="ICBM" content="39.9612, -82.9988" />
+        {/* Schema.org: Organization + WebSite (sitelinks search box, AI citations) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLd(organizationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLd(websiteSchema) }}
         />
       </head>
       <body className="antialiased" style={{ fontFamily: "'Inter', sans-serif" }}>

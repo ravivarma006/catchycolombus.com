@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { SUBURBS } from "@/lib/suburbs";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://catchcolumbus.com";
 
@@ -141,8 +142,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // Static: suburb landing pages (long-tail SEO + GEO)
+  const suburbPages: MetadataRoute.Sitemap = SUBURBS.map((s) => ({
+    url: `${SITE_URL}/columbus/${s.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
   return [
     ...staticPages,
+    ...suburbPages,
     ...categoryPages,
     ...providerPages,
     ...eventPages,
