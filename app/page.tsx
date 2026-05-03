@@ -9,7 +9,8 @@ import BannersSection from "@/components/home/BannersSection";
 import SupportLocalSection from "@/components/home/SupportLocalSection";
 import NeverMissDealsSection from "@/components/home/NeverMissDealsSection";
 import BusinessOwnerSection from "@/components/home/BusinessOwnerSection";
-import FAQSection, { HOMEPAGE_FAQS } from "@/components/home/FAQSection";
+import FAQSection from "@/components/home/FAQSection";
+import { HOMEPAGE_FAQS } from "@/lib/faq-data";
 import { faqSchema, jsonLd } from "@/lib/schema";
 import type { FeaturedDeal } from "@/components/home/FeaturedDealsSection";
 
