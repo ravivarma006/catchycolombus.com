@@ -77,12 +77,12 @@ export default function Navbar({ user }: NavbarProps) {
   }
 
   return (
-    <nav className="bg-white text-gray-800 shadow-sm border-b border-gray-100">
+    <nav className="bg-[#0D0D0D] text-white shadow-lg shadow-black/40 border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <span className="text-primary font-black text-xl tracking-tight">
+            <span className="text-white font-black text-xl tracking-tight">
               Catch Columbus
             </span>
           </Link>
@@ -96,8 +96,8 @@ export default function Navbar({ user }: NavbarProps) {
                   href={link.href}
                   className={`relative group px-3 py-1.5 rounded-lg transition-all duration-200 ${
                     isActive(link.href)
-                      ? "text-primary bg-primary/10"
-                      : "text-gray-600 hover:text-primary hover:bg-primary/5"
+                      ? "text-accent bg-white/10"
+                      : "text-white/70 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   {/* Label with subtle tracking shift on hover */}
@@ -129,7 +129,7 @@ export default function Navbar({ user }: NavbarProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search events, services, coupons..."
-                className="flex-1 border border-gray-200 rounded-lg px-4 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-1.5 text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition"
               />
               <button
                 type="submit"
@@ -140,7 +140,7 @@ export default function Navbar({ user }: NavbarProps) {
               <button
                 type="button"
                 onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
-                className="p-1.5 text-gray-400 hover:text-gray-600 transition"
+                className="p-1.5 text-white/40 hover:text-white transition"
                 aria-label="Close search"
               >
                 <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -155,7 +155,7 @@ export default function Navbar({ user }: NavbarProps) {
             {/* Search icon */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2 rounded-md text-gray-500 hover:text-primary hover:bg-gray-100 transition"
+              className="p-2 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition"
               aria-label="Search"
             >
               <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -167,14 +167,14 @@ export default function Navbar({ user }: NavbarProps) {
               <>
                 <Link
                   href={user.role === "admin" ? "/admin" : "/dashboard"}
-                  className="text-sm font-semibold hover:text-primary transition"
+                  className="text-sm font-semibold text-white/70 hover:text-white transition"
                 >
                   {user.role === "admin" ? "Admin" : "Dashboard"}
                 </Link>
                 <form action={logout}>
                   <button
                     type="submit"
-                    className="bg-accent text-primary px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-yellow-400 transition"
+                    className="bg-accent text-[#020C1B] px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-yellow-400 transition"
                   >
                     Sign Out
                   </button>
@@ -184,7 +184,7 @@ export default function Navbar({ user }: NavbarProps) {
               <>
                 <Link
                   href="/auth/login"
-                  className="p-2 rounded-md text-gray-500 hover:text-primary hover:bg-gray-100 transition"
+                  className="p-2 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition"
                   aria-label="Sign in"
                   title="Sign In"
                 >
@@ -195,7 +195,7 @@ export default function Navbar({ user }: NavbarProps) {
                 </Link>
                 <button
                   onClick={openSubscribe}
-                  className="bg-accent text-primary px-4 py-1.5 rounded-lg text-sm font-bold shadow-sm hover:shadow hover:bg-yellow-400 transition"
+                  className="bg-accent text-[#020C1B] px-4 py-1.5 rounded-lg text-sm font-bold shadow-sm hover:shadow hover:bg-yellow-400 transition"
                 >
                   Subscribe
                 </button>
@@ -207,7 +207,7 @@ export default function Navbar({ user }: NavbarProps) {
           <div className="md:hidden flex items-center gap-1">
             <Link
               href="/search"
-              className="p-2 rounded-md text-gray-500 hover:text-primary hover:bg-gray-100 transition"
+              className="p-2 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition"
               aria-label="Search"
             >
               <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -215,13 +215,13 @@ export default function Navbar({ user }: NavbarProps) {
               </svg>
             </Link>
             <button
-              className="p-2 rounded-md hover:bg-gray-100 transition"
+              className="p-2 rounded-md hover:bg-white/10 transition"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
-              <div className={`w-5 h-0.5 bg-gray-800 mb-1 transition-transform ${menuOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
-              <div className={`w-5 h-0.5 bg-gray-800 mb-1 transition-opacity ${menuOpen ? 'opacity-0' : ''}`} />
-              <div className={`w-5 h-0.5 bg-gray-800 transition-transform ${menuOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
+              <div className={`w-5 h-0.5 bg-white mb-1 transition-transform ${menuOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
+              <div className={`w-5 h-0.5 bg-white mb-1 transition-opacity ${menuOpen ? 'opacity-0' : ''}`} />
+              <div className={`w-5 h-0.5 bg-white transition-transform ${menuOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
             </button>
           </div>
         </div>
@@ -229,39 +229,39 @@ export default function Navbar({ user }: NavbarProps) {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 px-4 py-3 space-y-1 text-sm font-semibold">
+        <div className="md:hidden bg-[#0D0D0D] border-t border-white/10 px-4 py-3 space-y-1 text-sm font-semibold">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 ${
                 isActive(link.href)
-                  ? "text-primary bg-primary/10 border-l-[3px] border-accent pl-3"
-                  : "text-gray-700 hover:text-primary hover:bg-primary/5 hover:pl-4 border-l-[3px] border-transparent"
+                  ? "text-accent bg-white/10 border-l-[3px] border-accent pl-3"
+                  : "text-white/70 hover:text-white hover:bg-white/10 hover:pl-4 border-l-[3px] border-transparent"
               }`}
             >
               {link.label}
             </Link>
           ))}
-          <div className="pt-2 mt-2 border-t border-gray-100">
+          <div className="pt-2 mt-2 border-t border-white/10">
             {user ? (
               <>
                 <Link
                   href={user.role === "admin" ? "/admin" : "/dashboard"}
-                  className="block text-gray-700 hover:text-primary hover:bg-gray-50 px-2 py-1.5 rounded-md transition"
+                  className="block text-white/70 hover:text-white hover:bg-white/10 px-2 py-1.5 rounded-md transition"
                 >
                   {user.role === "admin" ? "Admin Dashboard" : "Business Dashboard"}
                 </Link>
                 <form action={logout}>
-                  <button type="submit" className="w-full text-left text-primary font-bold hover:bg-gray-50 px-2 py-1.5 rounded-md transition">
+                  <button type="submit" className="w-full text-left text-accent font-bold hover:bg-white/10 px-2 py-1.5 rounded-md transition">
                     Sign Out
                   </button>
                 </form>
               </>
             ) : (
               <>
-                <Link href="/auth/login" className="block text-gray-700 hover:text-primary hover:bg-gray-50 px-2 py-1.5 rounded-md transition">Sign In</Link>
-                <button onClick={openSubscribe} className="block w-full text-center bg-accent text-primary font-bold px-2 py-1.5 rounded-md hover:bg-yellow-400 transition mt-1">Subscribe</button>
+                <Link href="/auth/login" className="block text-white/70 hover:text-white hover:bg-white/10 px-2 py-1.5 rounded-md transition">Sign In</Link>
+                <button onClick={openSubscribe} className="block w-full text-center bg-accent text-[#020C1B] font-bold px-2 py-1.5 rounded-md hover:bg-yellow-400 transition mt-1">Subscribe</button>
               </>
             )}
           </div>
