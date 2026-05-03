@@ -78,6 +78,7 @@ export default function HeroSection({ slides, stats, deals = [], heroSettings }:
 
   // Video-specific state
   const [videoPaused, setVideoPaused] = useState(false);
+  const [videoMuted, setVideoMuted] = useState(true); // starts muted (browser autoplay requirement)
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const sectionRef = useRef<HTMLElement>(null);
@@ -101,6 +102,14 @@ export default function HeroSection({ slides, stats, deals = [], heroSettings }:
     if (!v) return;
     if (v.paused) { v.play(); setVideoPaused(false); }
     else          { v.pause(); setVideoPaused(true); }
+  }
+
+  /* toggle video mute/unmute */
+  function toggleMute() {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setVideoMuted(v.muted);
   }
 
   /* ── Two-phase auto-rotate ── */
@@ -276,7 +285,7 @@ export default function HeroSection({ slides, stats, deals = [], heroSettings }:
             src={videoUrl}
             poster={videoThumbUrl || undefined}
             autoPlay
-            muted
+            muted={videoMuted}
             loop
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
@@ -524,40 +533,79 @@ export default function HeroSection({ slides, stats, deals = [], heroSettings }:
             ))}
           </motion.div>
 
-          {/* Video play/pause button — only in video mode */}
+          {/* Video controls — play/pause + mute/unmute — only in video mode */}
           {heroMode === "video" && videoUrl && (
-            <motion.button
-              onClick={toggleVideo}
+            <motion.div
+              className="flex items-center gap-2"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1, transition: { delay: 0.7, duration: 0.4 } }}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.94 }}
-              className="flex items-center gap-2.5 px-5 py-2.5 rounded-full font-semibold text-sm transition-all"
-              style={{
-                background: "rgba(255,255,255,0.12)",
-                border: "1.5px solid rgba(255,255,255,0.25)",
-                color: "rgba(255,255,255,0.90)",
-                backdropFilter: "blur(10px)",
-                fontFamily: "'Inter', sans-serif",
-              }}
-              aria-label={videoPaused ? "Play video" : "Pause video"}
             >
-              {videoPaused ? (
-                <>
-                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                  Play
-                </>
-              ) : (
-                <>
-                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                  </svg>
-                  Pause
-                </>
-              )}
-            </motion.button>
+              {/* Play / Pause */}
+              <motion.button
+                onClick={toggleVideo}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.94 }}
+                className="flex items-center gap-2.5 px-5 py-2.5 rounded-full font-semibold text-sm transition-all"
+                style={{
+                  background: "rgba(255,255,255,0.12)",
+                  border: "1.5px solid rgba(255,255,255,0.25)",
+                  color: "rgba(255,255,255,0.90)",
+                  backdropFilter: "blur(10px)",
+                  fontFamily: "'Inter', sans-serif",
+                }}
+                aria-label={videoPaused ? "Play video" : "Pause video"}
+              >
+                {videoPaused ? (
+                  <>
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                    Play
+                  </>
+                ) : (
+                  <>
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                    </svg>
+                    Pause
+                  </>
+                )}
+              </motion.button>
+
+              {/* Mute / Unmute */}
+              <motion.button
+                onClick={toggleMute}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.94 }}
+                className="flex items-center gap-2.5 px-5 py-2.5 rounded-full font-semibold text-sm transition-all"
+                style={{
+                  background: videoMuted ? "rgba(255,255,255,0.08)" : "rgba(245,168,0,0.20)",
+                  border: videoMuted ? "1.5px solid rgba(255,255,255,0.20)" : "1.5px solid rgba(245,168,0,0.60)",
+                  color: videoMuted ? "rgba(255,255,255,0.60)" : "var(--accent)",
+                  backdropFilter: "blur(10px)",
+                  fontFamily: "'Inter', sans-serif",
+                }}
+                aria-label={videoMuted ? "Unmute video" : "Mute video"}
+              >
+                {videoMuted ? (
+                  <>
+                    {/* Muted speaker icon */}
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M16.5 12A4.5 4.5 0 0014 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0017.73 18L19 19.27 20.27 18 5.27 3 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                    </svg>
+                    Unmute
+                  </>
+                ) : (
+                  <>
+                    {/* Unmuted speaker icon */}
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                    </svg>
+                    Mute
+                  </>
+                )}
+              </motion.button>
+            </motion.div>
           )}
 
         </div>
