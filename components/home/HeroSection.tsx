@@ -261,10 +261,6 @@ export default function HeroSection({ slides, stats, deals = [], heroSettings }:
     );
   }
 
-  /* pad slide number */
-  const num = String(active + 1).padStart(2, "0");
-  const total = String(slides.length).padStart(2, "0");
-
   /* total cycle duration for progress bar */
   const cycleSec = (SHOW_DURATION + TEXT_EXIT_MS) / 1000;
 
@@ -379,12 +375,7 @@ export default function HeroSection({ slides, stats, deals = [], heroSettings }:
                 </span>
               </div>
 
-              {/* Slide counter */}
-              <div className="flex items-center gap-2" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                <span className="text-white font-bold text-xl md:text-2xl">{num}</span>
-                <div className="h-px w-10" style={{ background: `linear-gradient(90deg, ${"var(--accent)"}, rgba(255,255,255,0.25))` }} />
-                <span className="text-white/40 text-sm font-medium">{total}</span>
-              </div>
+              {/* Slide counter removed */}
             </motion.div>
           )}
         </AnimatePresence>
