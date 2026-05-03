@@ -25,7 +25,7 @@ export default async function CouponsPage() {
   let canSubmit = false;
   if (user) {
     const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-    canSubmit = profile?.role === "business_user" || profile?.role === "admin";
+    canSubmit = profile?.role === "admin";
   }
 
   const { data: categories } = await supabase
@@ -80,10 +80,10 @@ export default async function CouponsPage() {
             </p>
           </div>
 
-          {/* Submit CTA — only for business_user / admin */}
+          {/* Submit CTA — admin only */}
           {canSubmit && (
             <Link
-              href="/coupons/submit"
+              href="/admin/coupons"
               className="inline-flex items-center gap-2 bg-accent hover:bg-yellow-400 text-[#020C1B] font-bold text-sm px-6 py-3 rounded-2xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-500/20 shrink-0 mt-2"
             >
               <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
