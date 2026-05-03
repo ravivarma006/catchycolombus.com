@@ -18,6 +18,7 @@ export default async function Home() {
     { data: featuredActivities },
     { data: heroSlides },
     { data: heroStats },
+    { data: heroSettingsData },
     { data: dealCoupons },
     { data: dealEvents },
   ] = await Promise.all([
@@ -51,6 +52,11 @@ export default async function Home() {
       .select("value, label")
       .eq("is_active", true)
       .order("display_order", { ascending: true }),
+    supabase
+      .from("hero_settings")
+      .select("hero_mode, video_url, video_thumb_url")
+      .eq("id", 1)
+      .single(),
     supabase
       .from("coupons")
       .select(`id, product_service_name, description, coupon_code, image_url,
@@ -121,6 +127,12 @@ export default async function Home() {
     ...eventDeals,
   ].slice(0, 3);
 
+  const heroSettings = {
+    heroMode: (heroSettingsData?.hero_mode ?? "slides") as "slides" | "video",
+    videoUrl: heroSettingsData?.video_url ?? "",
+    videoThumbUrl: heroSettingsData?.video_thumb_url ?? "",
+  };
+
   return (
     <>
       <HeroSection
@@ -137,6 +149,7 @@ export default async function Home() {
         }))}
         stats={(heroStats ?? []).map((s: any) => ({ value: s.value, label: s.label }))}
         deals={featuredDeals}
+        heroSettings={heroSettings}
       />
       <CategoriesSection />
       <ThingsToDoSection activities={(featuredActivities ?? []).map((a: any) => ({

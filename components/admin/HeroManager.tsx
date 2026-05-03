@@ -11,8 +11,11 @@ import {
   updateHeroStat,
   toggleHeroStatActive,
   deleteHeroStat,
+  setHeroMode,
+  saveHeroVideo,
 } from "@/app/admin/hero/actions";
 import ImageUpload from "@/components/admin/ImageUpload";
+import VideoUpload from "@/components/admin/VideoUpload";
 import Image from "next/image";
 import AdminSlidePanel from "@/components/admin/AdminSlidePanel";
 
@@ -38,19 +41,33 @@ interface HeroStat {
   is_active: boolean;
 }
 
+interface HeroSettings {
+  hero_mode: "slides" | "video";
+  video_url: string;
+  video_thumb_url: string;
+}
+
 const INPUT_CLS =
   "w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white text-sm placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-accent";
 
 export default function HeroManager({
   slides,
   stats,
+  heroSettings,
 }: {
   slides: HeroSlide[];
   stats: HeroStat[];
+  heroSettings: HeroSettings;
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"slides" | "stats">("slides");
+  const [tab, setTab] = useState<"slides" | "stats" | "video">("slides");
+
+  // Video settings state
+  const [currentMode, setCurrentMode] = useState<"slides" | "video">(heroSettings.hero_mode);
+  const [videoUrl, setVideoUrl] = useState(heroSettings.video_url);
+  const [videoThumbUrl, setVideoThumbUrl] = useState(heroSettings.video_thumb_url);
+  const [videoSaved, setVideoSaved] = useState(false);
 
   // Slide form state
   const [showSlideForm, setShowSlideForm] = useState(false);
@@ -151,6 +168,26 @@ export default function HeroManager({
   function handleDeleteStat(id: string) {
     if (!confirm("Delete this stat?")) return;
     startTransition(async () => { await deleteHeroStat(id); });
+  }
+
+  /* ── Video / Mode Handlers ── */
+  function handleSetMode(mode: "slides" | "video") {
+    startTransition(async () => {
+      const result = await setHeroMode(mode);
+      if (result.error) setError(result.error);
+      else setCurrentMode(mode);
+    });
+  }
+
+  function handleSaveVideo() {
+    if (!videoUrl) { setError("Please upload a video first."); return; }
+    setError(null);
+    setVideoSaved(false);
+    startTransition(async () => {
+      const result = await saveHeroVideo(videoUrl, videoThumbUrl);
+      if (result.error) setError(result.error);
+      else setVideoSaved(true);
+    });
   }
 
   /* ── Headline line helpers ── */
@@ -300,16 +337,25 @@ export default function HeroManager({
   return (
     <div>
       {/* Tab Switcher */}
-      <div className="flex gap-2 mb-6">
-        {(["slides", "stats"] as const).map((t) => (
+      <div className="flex gap-2 mb-6 flex-wrap">
+        {(["slides", "stats", "video"] as const).map((t) => (
           <button
             key={t}
-            onClick={() => { setTab(t); setError(null); }}
-            className={`px-4 py-2 text-sm font-bold rounded-xl transition ${
+            onClick={() => { setTab(t); setError(null); setVideoSaved(false); }}
+            className={`px-4 py-2 text-sm font-bold rounded-xl transition flex items-center gap-2 ${
               tab === t ? "bg-accent text-primary" : "bg-white/10 text-white/60 hover:bg-white/20"
             }`}
           >
-            {t === "slides" ? `Slides (${slides.length})` : `Stats (${stats.length})`}
+            {t === "slides" && `Slides (${slides.length})`}
+            {t === "stats" && `Stats (${stats.length})`}
+            {t === "video" && (
+              <>
+                🎬 Video Hero
+                {currentMode === "video" && (
+                  <span className="text-[10px] font-bold bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-full">LIVE</span>
+                )}
+              </>
+            )}
           </button>
         ))}
       </div>
@@ -383,6 +429,103 @@ export default function HeroManager({
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══════════ VIDEO TAB ═══════════ */}
+      {tab === "video" && (
+        <div className="space-y-8">
+
+          {/* Mode toggle */}
+          <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-6">
+            <h2 className="text-white font-bold text-base mb-1">Hero Display Mode</h2>
+            <p className="text-white/40 text-sm mb-5">
+              Choose whether the home page hero shows the image carousel or a background video.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleSetMode("slides")}
+                disabled={isPending || currentMode === "slides"}
+                className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition ${
+                  currentMode === "slides"
+                    ? "bg-primary text-white border-2 border-accent"
+                    : "bg-white/10 text-white/60 hover:bg-white/20 border-2 border-transparent"
+                }`}
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <path d="M8 21h8M12 17v4" />
+                </svg>
+                Image Slides
+                {currentMode === "slides" && <span className="text-[10px] bg-accent/30 text-accent px-1.5 py-0.5 rounded-full">Active</span>}
+              </button>
+              <button
+                onClick={() => handleSetMode("video")}
+                disabled={isPending || currentMode === "video"}
+                className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition ${
+                  currentMode === "video"
+                    ? "bg-primary text-white border-2 border-accent"
+                    : "bg-white/10 text-white/60 hover:bg-white/20 border-2 border-transparent"
+                }`}
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+                Background Video
+                {currentMode === "video" && <span className="text-[10px] bg-accent/30 text-accent px-1.5 py-0.5 rounded-full">Active</span>}
+              </button>
+            </div>
+            {isPending && <p className="text-white/40 text-xs mt-3">Saving...</p>}
+          </div>
+
+          {/* Video upload */}
+          <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-6">
+            <h2 className="text-white font-bold text-base mb-1">Hero Video</h2>
+            <p className="text-white/40 text-sm mb-5">
+              Upload a full-bleed background video (MP4 recommended, max 50 MB). The video plays looped and muted. Visitors can pause/resume it.
+            </p>
+
+            <div className="space-y-5">
+              <div>
+                <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-2">Video File *</label>
+                <VideoUpload onUpload={setVideoUrl} currentUrl={videoUrl} />
+              </div>
+
+              <div>
+                <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-2">Fallback Thumbnail (optional)</label>
+                <p className="text-white/30 text-xs mb-2">Shown on mobile or while the video loads.</p>
+                <ImageUpload bucket="city-images" folder="hero/video-thumb" onUpload={setVideoThumbUrl} currentUrl={videoThumbUrl} />
+              </div>
+
+              {error && <p className="text-red-400 text-sm">{error}</p>}
+              {videoSaved && <p className="text-green-400 text-sm font-semibold">✓ Video saved successfully.</p>}
+
+              <button
+                type="button"
+                onClick={handleSaveVideo}
+                disabled={isPending || !videoUrl}
+                className="px-6 py-2.5 bg-accent text-primary font-bold rounded-xl text-sm hover:bg-yellow-400 transition disabled:opacity-50"
+              >
+                {isPending ? "Saving..." : "Save Video"}
+              </button>
+            </div>
+          </div>
+
+          {/* Current video preview */}
+          {heroSettings.video_url && (
+            <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-6">
+              <h2 className="text-white font-bold text-base mb-3">Current Saved Video</h2>
+              <video
+                src={heroSettings.video_url}
+                className="w-full max-h-52 rounded-xl object-cover border border-white/10"
+                controls
+                muted
+                playsInline
+                preload="metadata"
+              />
+              <p className="text-white/30 text-xs mt-2 break-all">{heroSettings.video_url}</p>
             </div>
           )}
         </div>

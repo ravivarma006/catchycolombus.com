@@ -290,6 +290,55 @@ export async function toggleHeroStatActive(
 }
 
 // ─────────────────────────────────────────
+// HERO SETTINGS — SET MODE (slides | video)
+// ─────────────────────────────────────────
+export async function setHeroMode(
+  mode: "slides" | "video"
+): Promise<{ error?: string; success?: boolean }> {
+  const { supabase, error: authError } = await requireAdmin();
+  if (authError) return { error: authError };
+
+  const { error } = await supabase
+    .from("hero_settings")
+    .update({ hero_mode: mode, updated_at: new Date().toISOString() })
+    .eq("id", 1);
+
+  if (error) {
+    console.error("[setHeroMode]", error.message);
+    return { error: "Could not update hero mode." };
+  }
+
+  revalidate();
+  return { success: true };
+}
+
+// ─────────────────────────────────────────
+// HERO SETTINGS — SAVE VIDEO URL
+// ─────────────────────────────────────────
+export async function saveHeroVideo(
+  video_url: string,
+  video_thumb_url: string
+): Promise<{ error?: string; success?: boolean }> {
+  const { supabase, error: authError } = await requireAdmin();
+  if (authError) return { error: authError };
+
+  if (!video_url) return { error: "Video URL is required." };
+
+  const { error } = await supabase
+    .from("hero_settings")
+    .update({ video_url, video_thumb_url, updated_at: new Date().toISOString() })
+    .eq("id", 1);
+
+  if (error) {
+    console.error("[saveHeroVideo]", error.message);
+    return { error: "Could not save video." };
+  }
+
+  revalidate();
+  return { success: true };
+}
+
+// ─────────────────────────────────────────
 // STATS — DELETE
 // ─────────────────────────────────────────
 export async function deleteHeroStat(

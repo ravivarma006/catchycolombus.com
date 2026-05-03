@@ -26,10 +26,17 @@ interface Slide {
   overlayTo: string;
 }
 
+interface HeroSettings {
+  heroMode: "slides" | "video";
+  videoUrl: string;
+  videoThumbUrl: string;
+}
+
 interface HeroSectionProps {
   slides: Slide[];
   stats: { value: string; label: string }[];
   deals?: FeaturedDeal[];
+  heroSettings?: HeroSettings;
 }
 
 /* ── Timing constants (ms) ── */
@@ -60,10 +67,19 @@ const fadeUp = {
 };
 
 /* ═══════════════════════════ COMPONENT ═══════════════════════════ */
-export default function HeroSection({ slides, stats, deals = [] }: HeroSectionProps) {
+export default function HeroSection({ slides, stats, deals = [], heroSettings }: HeroSectionProps) {
+  const heroMode  = heroSettings?.heroMode ?? "slides";
+  const videoUrl  = heroSettings?.videoUrl ?? "";
+  const videoThumbUrl = heroSettings?.videoThumbUrl ?? "";
+
   const [active, setActive] = useState(0);
   const [phase, setPhase]   = useState<"show" | "exiting">("show");
   const [paused, setPaused] = useState(false);
+
+  // Video-specific state
+  const [videoPaused, setVideoPaused] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const sectionRef = useRef<HTMLElement>(null);
 
   /* advance to next slide */
@@ -78,6 +94,14 @@ export default function HeroSection({ slides, stats, deals = [] }: HeroSectionPr
     setActive(i);
     setPhase("show");
   }, []);
+
+  /* toggle video play/pause */
+  function toggleVideo() {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) { v.play(); setVideoPaused(false); }
+    else          { v.pause(); setVideoPaused(true); }
+  }
 
   /* ── Two-phase auto-rotate ── */
   useEffect(() => {
@@ -141,8 +165,12 @@ export default function HeroSection({ slides, stats, deals = [] }: HeroSectionPr
     );
   }
 
-  const slide = slides[active];
-  const showText = phase === "show";
+  // In video mode use the first slide for headline text (if any), else fallback
+  const slide = heroMode === "video"
+    ? (slides[0] ?? { id: 0, image: "", thumb: "", location: "Columbus, Ohio", tag: "City Guide", headline: ["Discover", "Columbus"], sub: "Events, services, and hidden gems in the city you love.", overlayFrom: "rgba(0,20,50,0.55)", overlayTo: "rgba(0,20,50,0.30)" })
+    : slides[active];
+
+  const showText = heroMode === "video" ? true : phase === "show";
 
   /* Sanitize overlay colors to prevent CSS injection */
   const isValidColor = (c: string) =>
@@ -240,38 +268,53 @@ export default function HeroSection({ slides, stats, deals = [] }: HeroSectionPr
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={onMouseLeave}
     >
-      {/* ══════════════ FULL-BLEED PHOTO ══════════════ */}
-      <motion.div
-        className="absolute inset-0"
-        style={{ x: imgX, y: imgY, scale: 1.06 }}
-      >
-        <AnimatePresence mode="sync">
-          {slides
-            .filter((_, i) => i === active || i === (active + 1) % slides.length)
-            .map((s) => (
-              <motion.div
-                key={`img-${s.id}`}
-                className="absolute inset-0"
-                initial={{ opacity: s.id === slide.id ? 0 : 0, scale: 1.04 }}
-                animate={s.id === slide.id ? {
-                  opacity: 1,
-                  scale: 1.10,
-                  transition: { opacity: { duration: 0.9 }, scale: { duration: 8, ease: "linear" } },
-                } : { opacity: 0 }}
-                exit={{ opacity: 0, transition: { duration: 0.9 } }}
-              >
-                <Image
-                  src={s.image}
-                  alt={s.location}
-                  fill
-                  priority={s.id === slides[0]?.id}
-                  className="object-cover object-center"
-                  sizes="100vw"
-                />
-              </motion.div>
-            ))}
-        </AnimatePresence>
-      </motion.div>
+      {/* ══════════════ BACKGROUND: VIDEO or SLIDES ══════════════ */}
+      {heroMode === "video" && videoUrl ? (
+        <div className="absolute inset-0">
+          <video
+            ref={videoRef}
+            src={videoUrl}
+            poster={videoThumbUrl || undefined}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
+      ) : (
+        <motion.div
+          className="absolute inset-0"
+          style={{ x: imgX, y: imgY, scale: 1.06 }}
+        >
+          <AnimatePresence mode="sync">
+            {slides
+              .filter((_, i) => i === active || i === (active + 1) % slides.length)
+              .map((s) => (
+                <motion.div
+                  key={`img-${s.id}`}
+                  className="absolute inset-0"
+                  initial={{ opacity: s.id === slide.id ? 0 : 0, scale: 1.04 }}
+                  animate={s.id === slide.id ? {
+                    opacity: 1,
+                    scale: 1.10,
+                    transition: { opacity: { duration: 0.9 }, scale: { duration: 8, ease: "linear" } },
+                  } : { opacity: 0 }}
+                  exit={{ opacity: 0, transition: { duration: 0.9 } }}
+                >
+                  <Image
+                    src={s.image}
+                    alt={s.location}
+                    fill
+                    priority={s.id === slides[0]?.id}
+                    className="object-cover object-center"
+                    sizes="100vw"
+                  />
+                </motion.div>
+              ))}
+          </AnimatePresence>
+        </motion.div>
+      )}
 
       {/* ══════════════ DARK OVERLAY ══════════════ */}
       <AnimatePresence mode="wait">
@@ -454,7 +497,7 @@ export default function HeroSection({ slides, stats, deals = [] }: HeroSectionPr
           </AnimatePresence>
         </div>
 
-        {/* ── BOTTOM ROW : stats + thumbnail nav ── */}
+        {/* ── BOTTOM ROW : stats + video controls / thumbnail nav ── */}
         <div className="flex flex-col md:flex-row items-end md:items-center justify-between gap-6">
 
           {/* City stats */}
@@ -480,6 +523,42 @@ export default function HeroSection({ slides, stats, deals = [] }: HeroSectionPr
               </div>
             ))}
           </motion.div>
+
+          {/* Video play/pause button — only in video mode */}
+          {heroMode === "video" && videoUrl && (
+            <motion.button
+              onClick={toggleVideo}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1, transition: { delay: 0.7, duration: 0.4 } }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.94 }}
+              className="flex items-center gap-2.5 px-5 py-2.5 rounded-full font-semibold text-sm transition-all"
+              style={{
+                background: "rgba(255,255,255,0.12)",
+                border: "1.5px solid rgba(255,255,255,0.25)",
+                color: "rgba(255,255,255,0.90)",
+                backdropFilter: "blur(10px)",
+                fontFamily: "'Inter', sans-serif",
+              }}
+              aria-label={videoPaused ? "Play video" : "Pause video"}
+            >
+              {videoPaused ? (
+                <>
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  Play
+                </>
+              ) : (
+                <>
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                  </svg>
+                  Pause
+                </>
+              )}
+            </motion.button>
+          )}
 
         </div>
       </div>
