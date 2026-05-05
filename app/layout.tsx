@@ -151,9 +151,28 @@ export default async function RootLayout({
         <style dangerouslySetInnerHTML={{ __html: colorVars }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Non-blocking font load: preload + media-swap pattern so HTML paints immediately on mobile */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
+          rel="preload"
+          as="style"
+          href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+        />
+        <link
           rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+          media="print"
+        />
+        <noscript>
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+          />
+        </noscript>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "document.querySelectorAll('link[media=\"print\"][rel=\"stylesheet\"]').forEach(function(l){l.media='all';});",
+          }}
         />
         {/* Geographic targeting hints for search engines */}
         <meta name="geo.region" content="US-OH" />
