@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-
 export default function Error({
   error,
   reset,
@@ -9,9 +7,6 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    console.error("[App Error]", error.message, error.stack, error.digest);
-  }, [error]);
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4">
       <div className="text-center max-w-md">
@@ -37,16 +32,6 @@ export default function Error({
           We hit an unexpected error. Please try again or head back to the
           homepage.
         </p>
-        {error.digest && (
-          <p className="text-xs text-gray-400 mb-4 font-mono">
-            Digest: {error.digest}
-          </p>
-        )}
-        {error.message && (
-          <pre className="text-xs text-left text-red-600 bg-red-50 p-3 rounded mb-4 overflow-auto max-h-40">
-            {error.message}
-          </pre>
-        )}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
             onClick={reset}
