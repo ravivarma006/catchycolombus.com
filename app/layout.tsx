@@ -108,31 +108,34 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = createClient();
-  const [
-    { data: { user } },
-    { data: siteSettings },
-  ] = await Promise.all([
-    supabase.auth.getUser(),
-    supabase.from("site_settings").select("primary_color, accent_color").eq("id", 1).single(),
-  ]);
+  let navUser: { email: string | undefined; role: string | undefined } | null = null;
+  let primaryColor = "#0F4C5C";
+  let accentColor = "#F5A800";
 
-  let profile = null;
-  if (user) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-    profile = data;
+  try {
+    const supabase = createClient();
+    const [
+      { data: { user } },
+      { data: siteSettings },
+    ] = await Promise.all([
+      supabase.auth.getUser(),
+      supabase.from("site_settings").select("primary_color, accent_color").eq("id", 1).single(),
+    ]);
+
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+      navUser = { email: user.email, role: profile?.role };
+    }
+
+    primaryColor = siteSettings?.primary_color ?? "#0F4C5C";
+    accentColor = siteSettings?.accent_color ?? "#F5A800";
+  } catch (e) {
+    console.error("Layout: Supabase init failed, using defaults", e);
   }
-
-  const navUser = user
-    ? { email: user.email, role: profile?.role }
-    : null;
-
-  const primaryColor = siteSettings?.primary_color ?? "#0F4C5C";
-  const accentColor  = siteSettings?.accent_color  ?? "#F5A800";
   const primaryRgb   = hexToRgbParts(primaryColor);
   const accentRgb    = hexToRgbParts(accentColor);
 
