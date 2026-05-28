@@ -1,8 +1,15 @@
 import fs from 'fs';
 import path from 'path';
+import { config } from 'dotenv';
+config({ path: '.env.local' });
 
-const supabaseUrl = 'https://eoufiwxmxxhxkxzcswyz.supabase.co';
-const serviceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVvdWZpd3hteHhoeGt4emNzd3l6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzY0MDg3MSwiZXhwIjoyMDg5MjE2ODcxfQ.VUb5eQ8RsCj2aUYND-5b5YOGAkDS5xfJVqMflfX-ptQ';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !serviceKey) {
+  console.error('Missing env vars. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local');
+  process.exit(1);
+}
 
 const sourceDir = 'C:\\Users\\Prasanna Dantuluri\\.gemini\\antigravity\\brain\\89993520-7b25-4111-a427-9cbcaa857d37';
 const destDir = 'C:\\columbusapp\\public\\images\\events';
