@@ -25,10 +25,8 @@ export default async function DashboardPage() {
   const isBusiness = role === "business_user";
   const isAdmin    = role === "admin";
 
-  // Business users & admins are the only ones who should be here
-  // Visitors see the "upgrade to business" prompt
-
-  // Fetch provider-only counts + listings for business users
+  // Any logged-in user can submit business listings. Admin approves them.
+  // The dashboard shows stats/submissions/listings to anyone who has them.
   const [
     { count: pendingProviders },
     { count: changesProviders },
@@ -41,25 +39,26 @@ export default async function DashboardPage() {
     supabase.from("provider_requests").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "needs_changes"),
     supabase.from("provider_requests").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "approved"),
     supabase.from("provider_requests").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "rejected"),
-    // Live approved listings for this user
-    (isBusiness || isAdmin)
-      ? supabase
-          .from("service_providers")
-          .select("id, name, slug, image_url, address, phone, is_active, category:service_categories!category_id(name, slug)")
-          .eq("user_id", user.id)
-          .eq("is_active", true)
-          .order("approved_at", { ascending: false })
-      : Promise.resolve({ data: null }),
-    // Pending + needs_changes submissions so the user can see / edit them
-    (isBusiness || isAdmin)
-      ? supabase
-          .from("provider_requests")
-          .select("id, business_name, image_url, address, status, admin_notes, created_at, updated_at")
-          .eq("user_id", user.id)
-          .in("status", ["pending", "needs_changes"])
-          .order("updated_at", { ascending: false })
-      : Promise.resolve({ data: null }),
+    supabase
+      .from("service_providers")
+      .select("id, name, slug, image_url, address, phone, is_active, category:service_categories!category_id(name, slug)")
+      .eq("user_id", user.id)
+      .eq("is_active", true)
+      .order("approved_at", { ascending: false }),
+    supabase
+      .from("provider_requests")
+      .select("id, business_name, image_url, address, status, admin_notes, created_at, updated_at")
+      .eq("user_id", user.id)
+      .in("status", ["pending", "needs_changes"])
+      .order("updated_at", { ascending: false }),
   ]);
+
+  const totalRequests =
+    (pendingProviders ?? 0) +
+    (changesProviders ?? 0) +
+    (approvedProviders ?? 0) +
+    (rejectedProviders ?? 0);
+  const hasAnyActivity = totalRequests > 0 || isBusiness || isAdmin;
 
   const firstName = profile?.full_name?.split(" ")[0] || "there";
   const listings  = (myListings ?? []) as any[];
@@ -141,8 +140,8 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* ── Visitor upgrade prompt ── */}
-        {role === "visitor" && (
+        {/* ── Visitor with no submissions yet ── */}
+        {role === "visitor" && totalRequests === 0 && (
           <div
             className="rounded-2xl px-6 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6"
             style={{ background: "rgba(245,168,0,0.08)", border: "1px solid rgba(245,168,0,0.2)" }}
@@ -150,21 +149,21 @@ export default async function DashboardPage() {
             <div>
               <p className="text-white font-bold text-sm">Own a business in Columbus?</p>
               <p className="text-white/45 text-xs mt-0.5">
-                Register a business account to list your services for free.
+                List your business for free. Admin reviews and approves within 1–2 business days.
               </p>
             </div>
             <Link
-              href="/auth/business-signup"
+              href="/services/submit"
               className="shrink-0 px-5 py-2.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02]"
               style={{ background: "#F5A800", color: "#020C1B", fontFamily: "'Outfit', sans-serif" }}
             >
-              Register Business
+              List Your Business
             </Link>
           </div>
         )}
 
-        {/* ── Stats row (business / admin only) ── */}
-        {(isBusiness || isAdmin) && (
+        {/* ── Stats row ── */}
+        {hasAnyActivity && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             {[
               { label: "Pending",        value: pendingProviders  ?? 0, color: "text-blue-300" },
@@ -182,8 +181,8 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* ── Primary CTA: Add New Listing (business users) ── */}
-        {(isBusiness || isAdmin) && (
+        {/* ── Primary CTA: Add New Listing ── */}
+        {hasAnyActivity && (
           <Link
             href="/services/submit"
             className="group block w-full rounded-2xl p-6 md:p-7 mb-6 transition-all hover:scale-[1.005]"
@@ -221,7 +220,7 @@ export default async function DashboardPage() {
         )}
 
         {/* ── Open Submissions (pending / needs_changes) ── */}
-        {(isBusiness || isAdmin) && openSubmissions.length > 0 && (
+        {openSubmissions.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2
@@ -302,7 +301,7 @@ export default async function DashboardPage() {
         )}
 
         {/* ── Live Listings ── */}
-        {(isBusiness || isAdmin) && listings.length > 0 && (
+        {listings.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2
@@ -366,7 +365,7 @@ export default async function DashboardPage() {
         )}
 
         {/* ── My Submissions link ── */}
-        {(isBusiness || isAdmin) && (
+        {hasAnyActivity && (
           <Link
             href="/dashboard/submissions"
             className="group flex items-center justify-between w-full bg-white/[0.06] hover:bg-white/[0.10] border border-white/10 hover:border-white/20 rounded-2xl px-6 py-4 transition-all"
@@ -386,7 +385,7 @@ export default async function DashboardPage() {
         )}
 
         {/* ── Empty state for business user with no listings ── */}
-        {isBusiness && listings.length === 0 && (pendingProviders ?? 0) === 0 && (changesProviders ?? 0) === 0 && (approvedProviders ?? 0) === 0 && (
+        {isBusiness && listings.length === 0 && totalRequests === 0 && (
           <div className="bg-white/[0.05] border border-white/10 rounded-3xl p-10 text-center mt-8">
             <div className="text-5xl mb-4 opacity-40">🏢</div>
             <p className="text-white/60 font-bold text-base mb-1">No listings yet</p>

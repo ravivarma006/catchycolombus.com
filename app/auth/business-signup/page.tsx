@@ -1,10 +1,20 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 import { businessSignup } from "./actions";
 
 export default function BusinessSignupPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) router.replace("/services/submit");
+    });
+  }, [router]);
   const [error, setError]         = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [password, setPassword]   = useState("");
