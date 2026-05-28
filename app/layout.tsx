@@ -195,11 +195,11 @@ export default async function RootLayout({
       <body className="antialiased" style={{ fontFamily: "'Inter', sans-serif" }}>
         <GoogleAnalytics />
         <Navbar user={navUser} />
-        <main className={!user ? "pb-16 md:pb-0" : ""}>{children}</main>
+        <main className={!navUser ? "pb-16 md:pb-0" : ""}>{children}</main>
         <Footer />
-        {!user && <StickyDealBar />}
-        {!user && <ExitIntentPopup />}
-        {!user && <MobileBottomNav />}
+        {!navUser && <StickyDealBar />}
+        {!navUser && <ExitIntentPopup />}
+        {!navUser && <MobileBottomNav />}
       </body>
     </html>
   );
