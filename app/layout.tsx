@@ -133,7 +133,10 @@ export default async function RootLayout({
 
     primaryColor = siteSettings?.primary_color ?? "#0F4C5C";
     accentColor = siteSettings?.accent_color ?? "#F5A800";
-  } catch (e) {
+  } catch (e: any) {
+    if (e?.message?.includes("Dynamic server usage") || e?.digest?.startsWith("DYNAMIC_SERVER_USAGE")) {
+      throw e;
+    }
     console.error("Layout: Supabase init failed, using defaults", e);
   }
   const primaryRgb   = hexToRgbParts(primaryColor);
